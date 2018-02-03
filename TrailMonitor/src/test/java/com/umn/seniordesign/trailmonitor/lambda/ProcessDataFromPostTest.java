@@ -1,6 +1,8 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -13,7 +15,7 @@ import com.amazonaws.services.lambda.runtime.Context;
  */
 public class ProcessDataFromPostTest {
 
-    private static Object input;
+    private static List<Map<String, String>> input;
 
     @BeforeClass
     public static void createInput() throws IOException {
