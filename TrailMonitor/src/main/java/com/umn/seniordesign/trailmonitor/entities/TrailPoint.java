@@ -31,7 +31,7 @@ public class TrailPoint {
 	}
 	
 	public Double getLongitude() {
-		return this.latitude;
+		return this.longitude;
 	}
 	
 	public void setLongitude(Double longitude) {
