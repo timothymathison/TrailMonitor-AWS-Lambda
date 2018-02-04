@@ -2,11 +2,11 @@ package com.umn.seniordesign.trailmonitor.entities;
 
 public class TrailPoint {
 
-	public TrailPoint(Long timeStamp, Double latitude, Double longitude, Integer value) {
-		this.timeStamp = timeStamp;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.value = value;
+	public TrailPoint(/*Long timeStamp, Double latitude, Double longitude, Integer value*/) {
+//		this.timeStamp = timeStamp;
+//		this.latitude = latitude;
+//		this.longitude = longitude;
+//		this.value = value;
 	}
 	
 	private Long timeStamp;
@@ -44,5 +44,9 @@ public class TrailPoint {
 	
 	public void setValue(Integer value) {
 		this.value = value;
+	}
+	
+	public String toString() {
+		return "{TimeStamp=" + this.timeStamp + ", Latitude=" + this.latitude + ", Longitude=" + this.longitude + ", Value=" + this.value + "}";
 	}
 }
