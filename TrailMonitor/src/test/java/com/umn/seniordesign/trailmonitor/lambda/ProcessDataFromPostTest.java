@@ -9,13 +9,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
 public class ProcessDataFromPostTest {
 
-    private static List<Map<String, String>> input;
+    private static List<TrailPoint> input;
 
     @BeforeClass
     public static void createInput() throws IOException {
