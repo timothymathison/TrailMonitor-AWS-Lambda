@@ -2,19 +2,29 @@ package com.umn.seniordesign.trailmonitor.lambda;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.umn.seniordesign.trailmonitor.entities.PostDataRequest;
+import com.umn.seniordesign.trailmonitor.entities.PostDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
+import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
+import com.umn.seniordesign.trailmonitor.utilities.DataTypeMapper;
 
-public class ProcessDataFromPost implements RequestHandler<List<TrailPoint>, String> {
+public class ProcessDataFromPost implements RequestHandler<PostDataRequest, PostDataResponse> {
 
-    public String handleRequest(List<TrailPoint> data, Context context) {
-        context.getLogger().log("Data recieved");
-
-        // TODO: implement your handler
-        return "Hello from Lambda! Here is the data I recieved:" + Output(data);
+    public PostDataResponse handleRequest(PostDataRequest request, Context context) {
+    	List<TrailPoint> data = request.getData();
+        context.getLogger().log(data.size() + " trail data points recieved");
+        
+        DatabaseTask.saveItems(DataTypeMapper.makeRecords(data, request.getDeviceId()));
+        
+        //TODO: handle/return errors
+        
+        PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + data.size() 
+        		+ " trail points were received");
+        response.setEcho(Output(request.getData()));
+        return response;
     }
     
     static String Output(List<TrailPoint> input) {

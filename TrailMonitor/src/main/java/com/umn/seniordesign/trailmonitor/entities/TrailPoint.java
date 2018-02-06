@@ -1,13 +1,6 @@
 package com.umn.seniordesign.trailmonitor.entities;
 
 public class TrailPoint {
-
-	public TrailPoint(/*Long timeStamp, Double latitude, Double longitude, Integer value*/) {
-//		this.timeStamp = timeStamp;
-//		this.latitude = latitude;
-//		this.longitude = longitude;
-//		this.value = value;
-	}
 	
 	private Long timeStamp;
 	private Double latitude;
