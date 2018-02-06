@@ -8,14 +8,19 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.umn.seniordesign.trailmonitor.entities.PostDataRequest;
 import com.umn.seniordesign.trailmonitor.entities.PostDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
+import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
+import com.umn.seniordesign.trailmonitor.utilities.DataTypeMapper;
 
 public class ProcessDataFromPost implements RequestHandler<PostDataRequest, PostDataResponse> {
 
     public PostDataResponse handleRequest(PostDataRequest request, Context context) {
     	List<TrailPoint> data = request.getData();
         context.getLogger().log(data.size() + " trail data points recieved");
-
-        //TODO: save data to database
+        
+        DatabaseTask.saveItems(DataTypeMapper.makeRecords(data, request.getDeviceId()));
+        
+        //TODO: handle/return errors
+        
         PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + data.size() 
         		+ " trail points were received");
         response.setEcho(Output(request.getData()));

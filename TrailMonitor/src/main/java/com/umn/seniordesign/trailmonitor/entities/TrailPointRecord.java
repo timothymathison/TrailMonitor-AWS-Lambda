@@ -12,7 +12,7 @@ public class TrailPointRecord {
 	
 	private String compositeCoordinates;
 	private Calendar timeStamp;
-	private Integer deviceId;
+	private Long deviceId;
 	private Integer coordinate; //identifies position within a grid of squares divided up by integer gps coordinates
 	private Double latitude;
 	private Double longitude;
@@ -27,8 +27,8 @@ public class TrailPointRecord {
     public void setTimeStamp(Calendar timeStamp) { this.timeStamp = timeStamp; }
     
     @DynamoDBAttribute(attributeName = "DeviceId")
-    public Integer getDeviceId() { return this.deviceId; }
-    public void setDeviceId(Integer deviceId) { this.deviceId = deviceId; }
+    public Long getDeviceId() { return this.deviceId; }
+    public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
     
     @DynamoDBAttribute(attributeName = "Coordinate")
     public Integer getCoordinate() { return this.coordinate; }

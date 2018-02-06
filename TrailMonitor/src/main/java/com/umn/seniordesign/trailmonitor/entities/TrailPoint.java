@@ -1,9 +1,6 @@
 package com.umn.seniordesign.trailmonitor.entities;
 
 public class TrailPoint {
-
-	public TrailPoint() {
-	}
 	
 	private Long timeStamp;
 	private Double latitude;
