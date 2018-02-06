@@ -50,7 +50,7 @@ public class TrailPointRecord {
     	this.compositeCoordinates = latitude.toString() + longitude.toString();
     	this.latitude = latitude;
     	this.longitude = longitude;
-    	
+    	this.coordinate = ((int)Math.floor(longitude)) * 200 + ((int)Math.floor(latitude));
     }
     
     public void setTimeStampFromMilli(long milliseconds) {
