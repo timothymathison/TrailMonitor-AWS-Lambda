@@ -8,7 +8,9 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.umn.seniordesign.trailmonitor.entities.PostDataRequest;
 import com.umn.seniordesign.trailmonitor.entities.PostDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
+import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
+import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
 import com.umn.seniordesign.trailmonitor.utilities.DataTypeMapper;
 
 public class ProcessDataFromPost implements RequestHandler<PostDataRequest, PostDataResponse> {
@@ -17,9 +19,22 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
     	List<TrailPoint> data = request.getData();
         context.getLogger().log(data.size() + " trail data points recieved");
         
-        DatabaseTask.saveItems(DataTypeMapper.makeRecords(data, request.getDeviceId()));
+        if(request.getDeviceId() == null) {
+        	return new PostDataResponse(400, "Request missing deviceId");
+        }
         
-        //TODO: handle/return errors
+        List<TrailPointRecord> records;
+        try {
+        	records = DataTypeMapper.makeRecords(data, request.getDeviceId());
+        }
+        catch(Exception e) {
+        	return new PostDataResponse(400, e.getMessage());
+        }
+        
+        DatabaseTaskResult<Object> result = DatabaseTask.saveItems(records);
+        if(!result.isSuccess()) {
+        	return new PostDataResponse(500, result.getMessage());
+        }
         
         PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + data.size() 
         		+ " trail points were received");

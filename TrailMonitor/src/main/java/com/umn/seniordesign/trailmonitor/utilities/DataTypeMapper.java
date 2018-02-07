@@ -9,9 +9,10 @@ import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 
 public class DataTypeMapper {
 
-	public static TrailPointRecord makeRecord(TrailPoint data, long deviceId) {
-		
-		//TODO: check data integrity/completeness
+	public static TrailPointRecord makeRecord(TrailPoint data, long deviceId) throws Exception {
+		if(!data.valid()) {
+			throw new Exception("Missing or invalid data");
+		}
 		
 		TrailPointRecord record = new TrailPointRecord();
 		record.setAllCoordinates(data.getLatitude(), data.getLongitude());
@@ -21,7 +22,7 @@ public class DataTypeMapper {
 		return record;
 	}
 	
-	public static List<TrailPointRecord> makeRecords(List<TrailPoint> data, long deviceId) {
+	public static List<TrailPointRecord> makeRecords(List<TrailPoint> data, long deviceId) throws Exception {
 		List<TrailPointRecord> records = new LinkedList<TrailPointRecord>();
 		Iterator<TrailPoint> iterator = data.iterator();
 		

@@ -11,7 +11,7 @@ public class TrailPoint {
 		return this.timeStamp;
 	}
 	
-	public void setTimeStamp(long timeStamp) {
+	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 	
@@ -39,7 +39,11 @@ public class TrailPoint {
 		this.value = value;
 	}
 	
+	public boolean valid() {
+		return this.timeStamp != null && this.latitude != null && this.longitude != null && this.value != null;
+	}
+	
 	public String toString() {
-		return "{TimeStamp=" + this.timeStamp + ", Latitude=" + this.latitude + ", Longitude=" + this.longitude + ", Value=" + this.value + "}";
+		return "{TimeStamp : " + this.timeStamp + ", Latitude : " + this.latitude + ", Longitude : " + this.longitude + ", Value : " + this.value + "}";
 	}
 }

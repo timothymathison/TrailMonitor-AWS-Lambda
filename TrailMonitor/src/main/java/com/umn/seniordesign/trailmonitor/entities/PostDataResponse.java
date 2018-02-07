@@ -35,4 +35,8 @@ public class PostDataResponse {
 	public void setEcho(String data) {
 		this.echo = data;
 	}
+	
+	public String toString() {
+		return "";
+	}
 }
