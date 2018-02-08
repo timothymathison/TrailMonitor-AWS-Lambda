@@ -10,6 +10,10 @@ public class PostDataResponse {
 		this.status = status;
 		this.message = message;
 		this.echo = null;
+		
+		if(status != 200) {
+			throw new RuntimeException(this.toString());
+		}
 	}
 	
 	public String getMessage() {
@@ -37,6 +41,6 @@ public class PostDataResponse {
 	}
 	
 	public String toString() {
-		return "";
+		return "{\"message\": \"" + this.message + "\", \"status\": " + this.status + (this.echo != null ? ", \"echo\": " + this.echo : "") + "}";
 	}
 }
