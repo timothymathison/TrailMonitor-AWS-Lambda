@@ -1,7 +1,7 @@
 package com.umn.seniordesign.trailmonitor.services;
 
 public class DatabaseTaskResult<datatype> {
-	private boolean success;
+	private boolean success; //indicates whether task was a success
 	private String message;
 	private datatype data;
 	

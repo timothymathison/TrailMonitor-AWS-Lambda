@@ -11,6 +11,7 @@ public class PostDataResponse {
 		this.message = message;
 		this.echo = null;
 		
+		//if status anything besides default (200 - OK) must through exception for API to notice
 		if(status != 200) {
 			throw new RuntimeException(this.toString());
 		}

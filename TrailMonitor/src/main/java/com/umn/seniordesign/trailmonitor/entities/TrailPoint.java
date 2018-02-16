@@ -2,10 +2,10 @@ package com.umn.seniordesign.trailmonitor.entities;
 
 public class TrailPoint {
 	
-	private Long timeStamp;
+	private Long timeStamp; //in epoch milliseconds
 	private Double latitude;
 	private Double longitude;
-	private Integer value;
+	private Integer value; //intensity
 	
 	public Long getTimeStamp() {
 		return this.timeStamp;
@@ -39,7 +39,7 @@ public class TrailPoint {
 		this.value = value;
 	}
 	
-	public boolean valid() {
+	public boolean valid() { //checks the validity and completeness of this object
 		return this.timeStamp != null && this.latitude != null && this.longitude != null && this.value != null;
 	}
 	

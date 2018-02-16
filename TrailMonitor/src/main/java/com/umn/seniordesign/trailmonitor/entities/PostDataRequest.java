@@ -4,9 +4,6 @@ import java.util.List;
 
 public class PostDataRequest {
 	
-	public PostDataRequest() {
-	}
-	
 	private Long deviceId;
 	private List<TrailPoint> data;
 	

@@ -7,13 +7,13 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="TrailData_Beta")
+@DynamoDBTable(tableName="TrailData_Beta") //controls what table record is written to
 public class TrailPointRecord {
 	
 	private String compositeCoordinates;
 	private Calendar timeStamp;
 	private Long deviceId;
-	private Integer coordinate; //identifies position within a grid of squares divided up by integer gps coordinates
+	private Integer coordinate; //identifies position by what square within a grid of squares partitioned by integer gps coordinates
 	private Double latitude;
 	private Double longitude;
 	private Integer value;
@@ -50,6 +50,7 @@ public class TrailPointRecord {
     	this.compositeCoordinates = longitude.toString() + latitude.toString();
     	this.latitude = latitude;
     	this.longitude = longitude;
+    	//generate a unique linear value for each integer latitude/longitude combination
     	this.coordinate = ((int)Math.floor(longitude)) * 200 + ((int)Math.floor(latitude));
     }
     
