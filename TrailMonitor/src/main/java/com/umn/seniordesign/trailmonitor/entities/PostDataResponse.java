@@ -10,6 +10,11 @@ public class PostDataResponse {
 		this.status = status;
 		this.message = message;
 		this.echo = null;
+		
+		//if status anything besides default (200 - OK) must through exception for API to notice
+		if(status != 200) {
+			throw new RuntimeException(this.toString());
+		}
 	}
 	
 	public String getMessage() {
@@ -34,5 +39,9 @@ public class PostDataResponse {
 	
 	public void setEcho(String data) {
 		this.echo = data;
+	}
+	
+	public String toString() {
+		return "{\"message\": \"" + this.message + "\", \"status\": " + this.status + (this.echo != null ? ", \"echo\": " + this.echo : "") + "}";
 	}
 }
