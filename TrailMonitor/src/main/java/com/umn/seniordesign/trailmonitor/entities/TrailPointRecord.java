@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="TrailData") //controls what table record is written to
+@DynamoDBTable(tableName="TrailData_Beta") //controls what table record is written to
 public class TrailPointRecord {
 	
 	private String compositeCoordinates;
