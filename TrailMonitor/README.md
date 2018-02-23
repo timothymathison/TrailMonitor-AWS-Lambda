@@ -1,11 +1,11 @@
-##Trail Monitor AWS Service
+## Trail Monitor AWS Service
 
-#Summary
+# Summary
 
 This project comprises the back end data service for the Polaris 2018 Senior Design project.
 The service collects, processes, stores, and retrieves trail data corresponding to trail conditions around the world. Computing is accomplished using AWS (Amazon Web Services) Lambda functions.
 
-#Resources
+# Resources
 
 - [AWS Web Console Login](https://640567404774.signin.aws.amazon.com/console)
 - [Java IDE Eclipse](http://www.eclipse.org/downloads/)
