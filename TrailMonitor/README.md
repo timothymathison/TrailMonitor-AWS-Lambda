@@ -12,7 +12,7 @@ More to come.
 
 ## Data format
 
-Input Trail Data (JSON):
+### Input Trail Data (JSON):
 ```
 {"deviceId" : <unique-id>,
 	"data" :
@@ -28,8 +28,9 @@ Input Trail Data (JSON):
 }
 ```
 Post: `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
+---
 
-Output for visualization (GeoJSON):
+### Output for visualization (GeoJSON):
 To come.
 
 ## Resources
