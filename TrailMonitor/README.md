@@ -25,12 +25,16 @@ Data collection is done by the on-vehicle device designed as part of the same pr
 	]
 }
 ```
-Post: `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
-Headers: `Content-Type: application/json`
+Method: `POST`
+
+URL: `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
+
+Header(s): 
+- `Content-Type: application/json`
 
 ---
 
-### Output for visualization (GeoJSON):
+### Output for Visualization (GeoJSON):
 
 To come.
 
@@ -62,5 +66,6 @@ To come.
 
 - [AWS Web Console Login](https://640567404774.signin.aws.amazon.com/console)
 - [Getting started with AWS-Lambda](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html#getting-started-prerequisites)
+- [AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
 - [AWS API Gateway Template Mapping](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 - [AWS DynamoDB Java Data Mapping](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
