@@ -5,6 +5,7 @@
 This project comprises the back end data service for the Polaris 2018 Senior Design project.
 The service collects, processes, stores, and retrieves trail data corresponding to trail conditions around the world. Computing is accomplished using AWS (Amazon Web Services) Lambda functions.
 Data collection is done by the on-vehicle device designed as part of the same project.
+
 ---
 
 ## Data format
@@ -39,6 +40,7 @@ To come.
 
 Required:
 - [Java SE 8](https://docs.oracle.com/javase/8/)
+
 Recommended:
 - [IDE - Eclipse Oxygen](http://www.eclipse.org/downloads/)
 - [AWS Toolkit for Eclipse](https://aws.amazon.com/eclipse/)
@@ -53,6 +55,8 @@ To come.
 ## API Configuration
 
 To come.
+
+---
 
 ## Resources
 
