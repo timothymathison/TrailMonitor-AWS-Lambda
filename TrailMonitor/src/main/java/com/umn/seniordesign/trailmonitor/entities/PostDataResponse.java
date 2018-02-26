@@ -1,18 +1,29 @@
 package com.umn.seniordesign.trailmonitor.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PostDataResponse {
 	
+	private static final Map<Integer, String> statuses = new HashMap<Integer, String>();
+	static {
+		statuses.put(200, "200 OK");
+		statuses.put(204, "204 No Content");
+		statuses.put(400, "400 Bad Request");
+		statuses.put(500, "500 Internal Server Error");
+	}
+			
 	private String message;
-	private int status;
+	private String status;
 	private String echo; //optional - contains/echos the data that was received
 	
-	public PostDataResponse(int status, String message) {
-		this.status = status;
+	public PostDataResponse(int statusCode, String message) {
+		this.status = statuses.get(statusCode);
 		this.message = message;
 		this.echo = null;
 		
 		//if status anything besides default (200 - OK) must through exception for API to notice
-		if(status != 200) {
+		if(statusCode != 200) {
 			throw new RuntimeException(this.toString());
 		}
 	}
@@ -25,12 +36,12 @@ public class PostDataResponse {
 		this.message = message;
 	}
 	
-	public int getStatus() {
+	public String getStatus() {
 		return this.status;
 	}
 	
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatus(int statusCode) {
+		this.status = statuses.get(statusCode);
 	}
 	
 	public String getEcho() {
@@ -42,6 +53,7 @@ public class PostDataResponse {
 	}
 	
 	public String toString() {
-		return "{\"message\": \"" + this.message + "\", \"status\": " + this.status + (this.echo != null ? ", \"echo\": " + this.echo : "") + "}";
+		return "{\"message\": \"" + this.message + "\", \"status\": \"" + this.status + "\"" 
+				+ (this.echo != null ? ", \"echo\": " + this.echo : "") + "}";
 	}
 }

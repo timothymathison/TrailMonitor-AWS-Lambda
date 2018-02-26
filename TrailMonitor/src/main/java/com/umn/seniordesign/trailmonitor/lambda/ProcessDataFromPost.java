@@ -23,9 +23,11 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
 	 */
     public PostDataResponse handleRequest(PostDataRequest request, Context context) {
     	List<TrailPoint> data = request.getData();
-        context.getLogger().log(data.size() + " trail data points recieved"); //logged in cloud watch
         
+    	//TODO: Authenticate incoming data
+    	
         if(request.getDeviceId() == null) {
+        	context.getLogger().log("Bad Request: Request missing deviceId"); //logged in cloud watch
         	return new PostDataResponse(400, "Request missing deviceId");
         }
         
@@ -34,18 +36,21 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
         	records = DataTypeMapper.makeRecords(data, request.getDeviceId()); //convert data to database format
         }
         catch(Exception e) {
+        	context.getLogger().log("Bad Request: " + e.getMessage()); //logged in cloud watch
         	return new PostDataResponse(400, e.getMessage());
         }
         
         DatabaseTaskResult<Object> result = DatabaseTask.saveItems(records);  //save to database
         if(!result.isSuccess()) {
-        	return new PostDataResponse(500, result.getMessage());
+        	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
+        	return new PostDataResponse(500, "Error saving data");
         }
         
         //everything worked!
         PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + data.size() 
-        		+ " trail points were received");
+        		+ " trail points were received and saved");
         response.setEcho(Output(request.getData()));
+        context.getLogger().log("Success: " + result.getMessage()); //logged in cloud watch
         return response;
     }
     
