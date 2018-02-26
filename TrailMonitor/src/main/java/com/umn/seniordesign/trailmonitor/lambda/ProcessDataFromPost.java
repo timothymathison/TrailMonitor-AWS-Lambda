@@ -23,7 +23,7 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
 	 */
     public PostDataResponse handleRequest(PostDataRequest request, Context context) {
     	List<TrailPoint> data = request.getData();
-        
+    	context.getLogger().log("Request recieved with " + data.size() + " data points");
     	//TODO: Authenticate incoming data
     	
         if(request.getDeviceId() == null) {

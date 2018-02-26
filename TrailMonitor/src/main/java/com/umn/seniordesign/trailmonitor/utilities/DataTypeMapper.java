@@ -47,4 +47,6 @@ public class DataTypeMapper {
 		
 		return records;
 	}
+	
+	//TODO: Write GeoJson builder method
 }

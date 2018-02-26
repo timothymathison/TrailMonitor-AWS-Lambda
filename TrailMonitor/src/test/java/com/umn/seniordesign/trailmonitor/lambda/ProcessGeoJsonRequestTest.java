@@ -1,7 +1,6 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

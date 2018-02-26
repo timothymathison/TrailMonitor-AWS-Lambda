@@ -2,6 +2,8 @@ package com.umn.seniordesign.trailmonitor.entities;
 
 import java.util.List;
 
+//TODO: Document GeoJson class
+
 @SuppressWarnings({"rawtypes", "unused"})
 public class GeoJson {
 
