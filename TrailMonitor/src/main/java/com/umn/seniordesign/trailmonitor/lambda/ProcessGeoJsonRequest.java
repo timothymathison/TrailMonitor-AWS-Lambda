@@ -1,10 +1,12 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -23,19 +25,19 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Str
         
         //TODO: Authenticate data request
         
-        //TODO: query database for trail data
-        //TODO: convert trail records to GeoJson data
-        
+        //hard coded time for testing
         Calendar startTime = new Calendar.Builder().build();
         startTime.setTimeInMillis(0);
         
-        
         DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(
-        		Arrays.asList(17954, 17909), startTime);
+        		Arrays.asList(17954, 17909), startTime); //hard coded tiles for testing
         if(!result.isSuccess()) {
         	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
         	return result.getMessage();//new PostDataResponse(500, "Error saving data");
         }
+        
+        //TODO: convert trail records to GeoJson data
+        
         List<TrailPointRecord> items = result.getData();
     	return items.toString();
 

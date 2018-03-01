@@ -49,7 +49,7 @@ public class TrailPointRecord {
     
     @DynamoDBAttribute(attributeName = "Value")
     public Integer getValue() { return this.value; }
-    public void setValue(int value) { this.value = value; }
+    public void setValue(Integer value) { this.value = value; }
     
     public void setAllCoordinates(Double latitude, Double longitude) {
     	this.compositeCoordinates = longitude.toString() + latitude.toString();

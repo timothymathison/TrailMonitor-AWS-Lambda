@@ -1,8 +1,11 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
@@ -52,12 +55,23 @@ public class DataConverter {
 	
 	
 	/**
-	 * Generates a unique linear value for each integer latitude/longitude combination
+	 * <h1>Generates a unique linear value (tile identifier) for each integer latitude/longitude combination</h1>
 	 * @param longitude - number of type Double representing a GPS longitude value
 	 * @param latitude - number of type Double representing a GPS latitude value
 	 * @return Value of type int identifying an latitude/longitude tile
 	 */
 	public static int reduceCoordinateDimension(Double longitude, Double latitude) {
 		return ((int)Math.floor(longitude)) * 200 + ((int)Math.floor(latitude));
+	}
+	
+	/**
+	 * @param datetime - Calendar object representing a point in time
+	 * @return String formatted time stamp relative to UTC time zone
+	 */
+	public static String timeStamp(Calendar datetime) {
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String timestr = dateFormatter.format(datetime.getTime());
+        return timestr;
 	}
 }

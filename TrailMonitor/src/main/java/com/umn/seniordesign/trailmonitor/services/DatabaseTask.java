@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
+import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
 
 public class DatabaseTask {
 	
@@ -35,6 +36,11 @@ public class DatabaseTask {
 		return new DatabaseTaskResult<Object>(true, dataPoints.size() + " data points saved", null);
 	}
 	
+	/**
+	 * 
+	 * @param tileCoordinates - List of integer tile identifiers calculated by @DatabaseConverter.reduceCoordinateDimension
+	 * @return DatabaseTaskResult class object indicating success and containing return data (if any)
+	 */
 	public static DatabaseTaskResult<List<TrailPointRecord>> readItems(List<Integer> tileCoordinates, Calendar startTime) {
 		List<TrailPointRecord> items = new LinkedList<TrailPointRecord>();
 		try {
@@ -42,17 +48,21 @@ public class DatabaseTask {
 			
 			DynamoDBQueryExpression<TrailPointRecord> queryExpression;
 			Map<String, AttributeValue> queryAttributes;
+			Map<String, String> dynamoDBReservedExpression = new HashMap<>();
+			dynamoDBReservedExpression.put("#time", "TimeStamp"); //TimeStamp is a reserved keywords so use an alias
 			
 			Iterator<Integer> tileIterator = tileCoordinates.iterator();
-			while(tileIterator.hasNext()) {
+			while(tileIterator.hasNext()) { //iterate through and query for each coordinate tile requested
 				queryAttributes = new HashMap<String, AttributeValue>();
-				queryAttributes.put(":coord", new AttributeValue().withN(tileIterator.next().toString()));
-				queryAttributes.put(":startTime", new AttributeValue().withS(startTime.toString()));
+				queryAttributes.put(":coord", new AttributeValue().withN(tileIterator.next().toString())); //coordinate tile to match
+				queryAttributes.put(":startTime", new AttributeValue().withS(DataConverter.timeStamp(startTime))); //start time to filter by
 				
 				queryExpression = new DynamoDBQueryExpression<TrailPointRecord>()
-						.withIndexName("Coordinate-TimeStamp-index")
-						.withKeyConditionExpression("Coordinate = :coord and Timestamp >= :startTime")
-						.withExpressionAttributeValues(queryAttributes); //query from index based on linear (1-dimensional) Coordinate
+						.withIndexName("Coordinate-TimeStamp-index") //query from index based on linear (1-dimensional) Coordinate
+						.withConsistentRead(false)
+						.withKeyConditionExpression("Coordinate = :coord and #time >= :startTime")
+						.withExpressionAttributeValues(queryAttributes)
+						.withExpressionAttributeNames(dynamoDBReservedExpression);
 				
 				items.addAll(mapper.query(TrailPointRecord.class, queryExpression));
 			}	
