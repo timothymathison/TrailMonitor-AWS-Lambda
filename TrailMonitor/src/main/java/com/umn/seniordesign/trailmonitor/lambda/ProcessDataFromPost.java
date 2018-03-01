@@ -11,7 +11,7 @@ import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
-import com.umn.seniordesign.trailmonitor.utilities.DataTypeMapper;
+import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
 
 public class ProcessDataFromPost implements RequestHandler<PostDataRequest, PostDataResponse> {
 
@@ -33,7 +33,7 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
         
         List<TrailPointRecord> records;
         try {
-        	records = DataTypeMapper.makeRecords(data, request.getDeviceId()); //convert data to database format
+        	records = DataConverter.makeRecords(data, request.getDeviceId()); //convert data to database format
         }
         catch(Exception e) {
         	context.getLogger().log("Bad Request: " + e.getMessage()); //logged in cloud watch

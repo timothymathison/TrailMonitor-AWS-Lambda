@@ -7,7 +7,7 @@ import java.util.List;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 
-public class DataTypeMapper {
+public class DataConverter {
 
 	/**
 	 * <h1>Converts TrailPoint class to TrailPointRecord (database class)</h1>
@@ -49,4 +49,15 @@ public class DataTypeMapper {
 	}
 	
 	//TODO: Write GeoJson builder method
+	
+	
+	/**
+	 * Generates a unique linear value for each integer latitude/longitude combination
+	 * @param longitude - number of type Double representing a GPS longitude value
+	 * @param latitude - number of type Double representing a GPS latitude value
+	 * @return Value of type int identifying an latitude/longitude tile
+	 */
+	public static int reduceCoordinateDimension(Double longitude, Double latitude) {
+		return ((int)Math.floor(longitude)) * 200 + ((int)Math.floor(latitude));
+	}
 }

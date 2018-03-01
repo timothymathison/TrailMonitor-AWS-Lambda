@@ -104,10 +104,10 @@ public class GeoJson {
 				throw new Exception("Empty geometry coordinates list is prohibited");
 			}
 			this.coordinates = coordinates;
-			if(coordinates.get(0).getClass() == Integer.class) {
+			if(coordinates.get(0).getClass() == Double.class) {
 				this.type = GeometryTypes.Point;
 			}
-			else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Integer.class) {
+			else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Double.class) {
 				this.type = GeometryTypes.MultiPoint;
 			}
 			else {
