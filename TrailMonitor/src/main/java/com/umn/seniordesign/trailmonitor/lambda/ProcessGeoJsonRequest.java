@@ -1,8 +1,8 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -18,18 +18,31 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
 
     @Override
     public GetDataResponse<GeoJson> handleRequest(GetDataRequest request, Context context) {
-//    	Map<String, String> params = request.getParams();
-//        context.getLogger().log("Request from IP: " + request.getSourceIp() + " with params: " + params.toString());
+    	Map<String, String> params = request.getParams();
+        context.getLogger().log("Request from IP: " + request.getSourceIp() + " with params: " 
+        		+ (params != null ? params.toString() : "none")); //logged to cloud watch
         
         //TODO: Authenticate data request
         
-        //hard coded time for testing
+        //extract start-time from query parameters
         Calendar startTime = new Calendar.Builder().build();
-        startTime.setTimeInMillis(0);
+        try {
+        	startTime.setTimeInMillis(Long.parseLong(params.get("start-time")));
+        }
+        catch(NullPointerException | NumberFormatException e) {
+        	context.getLogger().log("Bad Request: missing or invalid start-time parameter");
+        	return new GetDataResponse<GeoJson>(400, "Missing or invalid start-time parameter", null);
+        }
         
-        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(
-        		Arrays.asList(17954, 17909), startTime); //hard coded tiles for testing
+        //translate the rectangular GPS limits into a list of tile coordinates
+        List<Integer> tiles = DataConverter.parseRequestCoords(params);
+        if(tiles.size() == 0) {
+        	context.getLogger().log("Bad Request: missing or invalid GPS limit parameters");
+        	return new GetDataResponse<GeoJson>(400, "Missing or invalid GPS limit parameters", null);
+        }
         
+        //query database
+        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(tiles, startTime);
         if(!result.isSuccess()) {
         	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
         	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
@@ -38,20 +51,15 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         //convert trail records to GeoJson data
         GeoJson geoJson;
         try {
-        	geoJson = DataConverter.buildGeoJson(result.getData(), context.getLogger());
+        	geoJson = DataConverter.buildGeoJson(result.getData());
         }
         catch(Exception e) { //error encountered building GeoJson data
         	context.getLogger().log("Internal Server Error: " + e.getMessage()); //logged in cloud watch
         	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
         }
         
-//        context.getLogger().log("# of features in GeoJson: " + geoJson.getFeatures().size());
-        
-//        List<TrailPointRecord> items = result.getData();
+        //Everything worked!
         context.getLogger().log("Success: " + result.getMessage());
     	return new GetDataResponse<GeoJson>(200, result.getMessage(), geoJson);
-
-//        return "Hello from Lambda! Here are the params I received from " + request.getSourceIp() +": " + params;
     }
-
 }

@@ -2,8 +2,6 @@ package com.umn.seniordesign.trailmonitor.entities.geojson;
 
 import java.util.List;
 
-//TODO: Document GeoJson class
-
 @SuppressWarnings("rawtypes")
 public class GeoJson {
 
@@ -42,6 +40,11 @@ public class GeoJson {
 		return new Feature(this.geometry, this.properties);
 	}
 	
+	/**
+	 * @param geometry - A valid object with class type Geometry
+	 * @param properties - A valid object with class type Properties
+	 * @throws Exception Thrown unless enclosing instance has type = GeoJson.Types.Feature
+	 */
 	public void setFeature(Geometry geometry, Properties properties) throws Exception {
 		if(this.type == Types.Feature) {
 			this.geometry = geometry;

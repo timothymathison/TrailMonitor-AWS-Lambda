@@ -1,14 +1,15 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
@@ -63,8 +64,7 @@ public class DataConverter {
 	 * @return Object of class type GeoJson
 	 * @throws Exception Thrown when the GeoJson is improperly built
 	 */
-	public static GeoJson buildGeoJson(List<TrailPointRecord> records, LambdaLogger l) throws Exception {
-//		l.log("# of records: " + records.size());
+	public static GeoJson buildGeoJson(List<TrailPointRecord> records) throws Exception {
 		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
 		//type "FeatureCollection" which contains a list of features to be plotted
 		List<Feature> features = new LinkedList<Feature>();
@@ -79,20 +79,61 @@ public class DataConverter {
 			properties = new Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
 			features.add(new Feature(geometry, properties));
 		}
-//		l.log("# of features: " + features.size());
 		geoJson.setFeatures(features);
 		
 		return geoJson;
 	}
 	
 	/**
-	 * <h1>Generates a unique linear value (tile identifier) for each integer latitude/longitude combination</h1>
+	 * <h1>Generates a unique linear value (tile identifier/coordinate) for each integer latitude/longitude combination</h1>
 	 * @param longitude - number of type Double representing a GPS longitude value
 	 * @param latitude - number of type Double representing a GPS latitude value
-	 * @return Value of type int identifying an latitude/longitude tile
+	 * @return Value of type int identifying an Integer latitude/longitude tile
 	 */
 	public static int reduceCoordinateDimension(Double longitude, Double latitude) {
-		return ((int)Math.floor(longitude)) * 200 + ((int)Math.floor(latitude));
+		return reduceCoordinateDimension(((int)Math.floor(longitude)), ((int)Math.floor(latitude)));
+	}
+	
+	/**
+	 * <h1>Generates a unique linear value (tile identifier/coordinate) for each integer latitude/longitude combination</h1>
+	 * @param longitude - number of type int representing a GPS longitude value
+	 * @param latitude - number of type int representing a GPS latitude value
+	 * @return Value of type int identifying an Integer latitude/longitude tile
+	 */
+	public static int reduceCoordinateDimension(int longitude, int latitude) {
+		return longitude * 200 + latitude;
+	}
+	
+	/**
+	 * <h1>Parses input params, describing a rectangular area relative to GPS, into a list of linear single dimensional tile coordinates</h1>
+	 * @param params - An object of type Map containing values for "lim-top", "lim-right", "lim-left", and "lim-bot"
+	 * @return A list of Integer global tile coordinates
+	 */
+	public static List<Integer> parseRequestCoords(Map<String, String> params) {
+		try {
+			int top = (int)Math.floor(Double.parseDouble(params.get("lim-top")));
+			int right = (int)Math.floor(Double.parseDouble(params.get("lim-right")));
+			int left = (int)Math.floor(Double.parseDouble(params.get("lim-left")));
+			int bot = (int)Math.floor(Double.parseDouble(params.get("lim-bot")));
+			
+			if(top < bot || right < left) { //limits are invalid
+				return new ArrayList<Integer>();
+			}
+			int height = top - bot + 1;
+			int width = right - left + 1;
+			
+			List<Integer> tileCoords = new ArrayList<Integer>(height * width);
+			for(int lat = top; lat >= bot; lat--) {
+				for(int lon = left; lon <= right; lon++) {
+					tileCoords.add(reduceCoordinateDimension(lon, lat)); //add single dimension tile coordinates to list
+				}
+			}
+			
+			return tileCoords;
+		}
+		catch(NullPointerException | NumberFormatException e) { //failed to parse limit parameters
+			return new ArrayList<Integer>(); //return empty list
+		}
 	}
 	
 	/**

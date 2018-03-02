@@ -73,7 +73,7 @@ public class DatabaseTask {
 		}
 		
 		
-		return new DatabaseTaskResult<List<TrailPointRecord>>(true, "Trail records retrieved", items);
+		return new DatabaseTaskResult<List<TrailPointRecord>>(true, items.size() + " trail records retrieved", items);
 	}
 
 }
