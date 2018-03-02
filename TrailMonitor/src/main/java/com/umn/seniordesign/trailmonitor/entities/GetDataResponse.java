@@ -3,7 +3,7 @@ package com.umn.seniordesign.trailmonitor.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostDataResponse {
+public class GetDataResponse<datatype> {
 	
 	private static final Map<Integer, String> statuses = new HashMap<Integer, String>();
 	static {
@@ -12,28 +12,24 @@ public class PostDataResponse {
 		statuses.put(400, "400 Bad Request");
 		statuses.put(500, "500 Internal Server Error");
 	}
-			
-	private String message;
-	private String status;
-	private String echo; //optional - contains/echos the data that was received
 	
-	public PostDataResponse(int statusCode, String message) {
+	private String status;
+	private String message;
+	private String type;
+	private datatype data;
+	
+	public GetDataResponse(int statusCode, String message, datatype data) {
 		this.status = statuses.get(statusCode);
 		this.message = message;
-		this.echo = null;
+		if(data != null) {
+			this.data = data;
+			this.type = data.getClass().getSimpleName().toLowerCase();
+		}
 		
 		//if status anything besides default (200 - OK) must through exception for API to notice
 		if(statusCode != 200) {
 			throw new RuntimeException(this.toString());
 		}
-	}
-	
-	public String getMessage() {
-		return this.message;
-	}
-	
-	public void setMessage(String message) {
-		this.message = message;
 	}
 	
 	public String getStatus() {
@@ -44,16 +40,28 @@ public class PostDataResponse {
 		this.status = statuses.get(statusCode);
 	}
 	
-	public String getEcho() {
-		return this.echo;
+	public String getMessage() {
+		return this.message;
 	}
 	
-	public void setEcho(String data) {
-		this.echo = data;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
+	public String getType() {
+		return this.type;
+	}
+	
+	public datatype getData() {
+		return this.data;
+	}
+	
+	public void setData(datatype data) {
+		this.data = data;
+	}
+
 	public String toString() {
-		return "{\"message\": \"" + this.message + "\", \"status\": \"" + this.status + "\"" 
-				+ (this.echo != null ? ", \"echo\": " + this.echo : "") + "}";
+		return "{\"message\": \"" + this.message + "\", \"status\": \"" + this.status + "\", \"type\": \"" + this.type + "\""
+				+ (this.data != null ? ", \"data\": " + this.data.toString() : "") + "}";
 	}
 }
