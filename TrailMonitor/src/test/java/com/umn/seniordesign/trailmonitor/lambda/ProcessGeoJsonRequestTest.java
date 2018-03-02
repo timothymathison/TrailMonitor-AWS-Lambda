@@ -7,7 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
+import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
@@ -36,7 +38,7 @@ public class ProcessGeoJsonRequestTest {
         ProcessGeoJsonRequest handler = new ProcessGeoJsonRequest();
         Context ctx = createContext();
 
-        String output = handler.handleRequest(input, ctx);
+        GetDataResponse<GeoJson> output = handler.handleRequest(input, ctx);
 
         //validate output here if needed.
         Assert.assertEquals("Hello from Lambda!", output);

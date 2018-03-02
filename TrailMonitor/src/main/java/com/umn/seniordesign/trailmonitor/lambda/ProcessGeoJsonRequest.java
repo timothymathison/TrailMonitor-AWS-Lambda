@@ -6,15 +6,18 @@ import java.util.List;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
+import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
+import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
 
-public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, String> {
+public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, GetDataResponse<GeoJson>> {
 
     @Override
-    public String handleRequest(GetDataRequest request, Context context) {
+    public GetDataResponse<GeoJson> handleRequest(GetDataRequest request, Context context) {
 //    	Map<String, String> params = request.getParams();
 //        context.getLogger().log("Request from IP: " + request.getSourceIp() + " with params: " + params.toString());
         
@@ -26,15 +29,24 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Str
         
         DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(
         		Arrays.asList(17954, 17909), startTime); //hard coded tiles for testing
+        
         if(!result.isSuccess()) {
         	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
-        	return result.getMessage();//new PostDataResponse(500, "Error saving data");
+        	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
         }
         
-        //TODO: convert trail records to GeoJson data
+        //convert trail records to GeoJson data
+        GeoJson geoJson;
+        try {
+        	geoJson = DataConverter.buildGeoJson(result.getData(), context.getLogger());
+        }
+        catch(Exception e) { //error encountered building GeoJson data
+        	context.getLogger().log("Internal Server Error: " + e.getMessage()); //logged in cloud watch
+        	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
+        }
         
-        List<TrailPointRecord> items = result.getData();
-    	return items.toString();
+//        List<TrailPointRecord> items = result.getData();
+    	return new GetDataResponse<GeoJson>(200, result.getMessage(), geoJson);
 
 //        return "Hello from Lambda! Here are the params I received from " + request.getSourceIp() +": " + params;
     }

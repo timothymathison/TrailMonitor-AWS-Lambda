@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
@@ -59,7 +60,8 @@ public class DataConverter {
 	 * @return Object of class type GeoJson
 	 * @throws Exception Thrown when the GeoJson is improperly built
 	 */
-	public static GeoJson buildGeoJson(List<TrailPointRecord> records) throws Exception {
+	public static GeoJson buildGeoJson(List<TrailPointRecord> records, LambdaLogger l) throws Exception {
+		l.log("# of records: " + records.size());
 		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
 		//type "FeatureCollection" which contains a list of features to be plotted
 		List<GeoJson.Feature> features = new LinkedList<GeoJson.Feature>();
@@ -74,6 +76,7 @@ public class DataConverter {
 			properties = new GeoJson.Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
 			features.add(new GeoJson.Feature(geometry, properties));
 		}
+		l.log("# of features: " + records.size());
 		geoJson.setFeatures(features);
 		
 		return new GeoJson(GeoJson.Types.FeatureCollection);

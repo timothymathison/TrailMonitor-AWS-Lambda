@@ -21,9 +21,10 @@ public class GetDataResponse<datatype> {
 	public GetDataResponse(int statusCode, String message, datatype data) {
 		this.status = statuses.get(statusCode);
 		this.message = message;
-		this.data = data;
-		
-		this.type = data.getClass().getSimpleName();
+		if(data != null) {
+			this.data = data;
+			this.type = data.getClass().getSimpleName();
+		}
 		
 		//if status anything besides default (200 - OK) must through exception for API to notice
 		if(statusCode != 200) {
