@@ -1,12 +1,14 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 
@@ -38,7 +40,7 @@ public class DataConverter {
 	 * @param data - List of TrailPoint class objects
 	 * @param deviceId - deviceId associated with data
 	 * @return List of TrailPointRecord objects
-	 * @throws Exception Invalid data
+	 * @throws Exception Thrown if data is in-valid
 	 */
 	public static List<TrailPointRecord> makeRecords(List<TrailPoint> data, long deviceId) throws Exception {
 		List<TrailPointRecord> records = new LinkedList<TrailPointRecord>();
@@ -51,8 +53,31 @@ public class DataConverter {
 		return records;
 	}
 	
-	//TODO: Write GeoJson builder method
-	
+	/**
+	 * <h1>Builds a GeoJson object containing features which can be interpreted and displayed on a map</h2>
+	 * @param records - List containing objects of class type TrailPointRecord
+	 * @return Object of class type GeoJson
+	 * @throws Exception Thrown when the GeoJson is improperly built
+	 */
+	public static GeoJson buildGeoJson(List<TrailPointRecord> records) throws Exception {
+		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
+		//type "FeatureCollection" which contains a list of features to be plotted
+		List<GeoJson.Feature> features = new LinkedList<GeoJson.Feature>();
+		TrailPointRecord record;
+		GeoJson.Geometry<Double> geometry;
+		GeoJson.Properties properties;
+		
+		Iterator<TrailPointRecord> iterator = records.iterator();
+		while(iterator.hasNext()) { //iterate through trail records and create features
+			record = iterator.next();
+			geometry = new GeoJson.Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
+			properties = new GeoJson.Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
+			features.add(new GeoJson.Feature(geometry, properties));
+		}
+		geoJson.setFeatures(features);
+		
+		return new GeoJson(GeoJson.Types.FeatureCollection);
+	}
 	
 	/**
 	 * <h1>Generates a unique linear value (tile identifier) for each integer latitude/longitude combination</h1>

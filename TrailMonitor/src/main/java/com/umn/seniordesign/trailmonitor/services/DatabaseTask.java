@@ -38,7 +38,7 @@ public class DatabaseTask {
 	
 	/**
 	 * 
-	 * @param tileCoordinates - List of integer tile identifiers calculated by @DatabaseConverter.reduceCoordinateDimension
+	 * @param tileCoordinates - List of integer tile identifiers calculated by {@link #DataConverter.reduceCoordinateDimension}
 	 * @return DatabaseTaskResult class object indicating success and containing return data (if any)
 	 */
 	public static DatabaseTaskResult<List<TrailPointRecord>> readItems(List<Integer> tileCoordinates, Calendar startTime) {

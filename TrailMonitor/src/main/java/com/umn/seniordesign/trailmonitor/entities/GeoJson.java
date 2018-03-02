@@ -24,6 +24,10 @@ public class GeoJson {
 		return this.features;
 	}
 	
+	/**
+	 * @param features - A list of {@link #features} objects
+	 * @throws Exception Thrown unless enclosing instance has type = GeoJson.Types.FeatureCollection
+	 */
 	public void setFeatures(List<Feature> features) throws Exception {
 		if(this.type == Types.FeatureCollection) {
 			this.features = features;
@@ -62,7 +66,7 @@ public class GeoJson {
 		//Incomplete list; can add more
 	}
 	
-	public class Feature {
+	public static class Feature {
 		private final String type = "Feature";
 		private Properties properties;
 		private Geometry geometry;
@@ -82,23 +86,43 @@ public class GeoJson {
 		
 	}
 	
-	public class Properties {
+	public static class Properties {
 		private int value;
+		private int deviceId;
+		private long timeStamp;
 		//more fields can be added (customizable)
 		
-		public Properties(int value) {
+		public Properties(int value, int deviceId, long timeStamp) {
 			this.value = value;
+			this.deviceId = deviceId;
+			this.timeStamp = timeStamp;
 		}
 		
 		public int getValue() {
 			return this.value;
 		}
+		
+		public int getDeviceId() {
+			return this.deviceId;
+		}
+		
+		public long getTimeStamp() {
+			return this.timeStamp;
+		}
 	}
 	
-	public class Geometry<coordinateType> {
+	/**
+	 * @param <coordinateType> - Can be Double or List<Double>
+	 */
+	public static class Geometry<coordinateType> {
 		private GeometryTypes type;
 		private List<coordinateType> coordinates;
 		
+		/**
+		 * <h1>Instantiates a new GeoJson.Geometry object if coordinates are a valid class type</h1>
+		 * @param coordinates - List containing class type Double or nested List<Double>. Innermost List should be length 2, element1: <longitude>, element2: <latitude>
+		 * @throws Exception Thrown if coordinates are empty or don't contain one of the two supported types
+		 */
 		public Geometry(List<coordinateType> coordinates) throws Exception {
 			if(coordinates.size() == 0) {
 				throw new Exception("Empty geometry coordinates list is prohibited");
@@ -106,9 +130,11 @@ public class GeoJson {
 			this.coordinates = coordinates;
 			if(coordinates.get(0).getClass() == Double.class) {
 				this.type = GeometryTypes.Point;
+				//TODO: validate coordinates
 			}
 			else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Double.class) {
 				this.type = GeometryTypes.MultiPoint;
+				//TODO: validate coordinates
 			}
 			else {
 				throw new Exception("Un-supported type for GeoJson.Geometry object");

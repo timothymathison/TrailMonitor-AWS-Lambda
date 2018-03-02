@@ -1,17 +1,12 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
-import com.umn.seniordesign.trailmonitor.entities.PostDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
