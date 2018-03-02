@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
+import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
+import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
+import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
+import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 
 public class DataConverter {
 
@@ -61,25 +64,25 @@ public class DataConverter {
 	 * @throws Exception Thrown when the GeoJson is improperly built
 	 */
 	public static GeoJson buildGeoJson(List<TrailPointRecord> records, LambdaLogger l) throws Exception {
-		l.log("# of records: " + records.size());
+//		l.log("# of records: " + records.size());
 		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
 		//type "FeatureCollection" which contains a list of features to be plotted
-		List<GeoJson.Feature> features = new LinkedList<GeoJson.Feature>();
+		List<Feature> features = new LinkedList<Feature>();
 		TrailPointRecord record;
-		GeoJson.Geometry<Double> geometry;
-		GeoJson.Properties properties;
+		Geometry<Double> geometry;
+		Properties properties;
 		
 		Iterator<TrailPointRecord> iterator = records.iterator();
 		while(iterator.hasNext()) { //iterate through trail records and create features
 			record = iterator.next();
-			geometry = new GeoJson.Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
-			properties = new GeoJson.Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
-			features.add(new GeoJson.Feature(geometry, properties));
+			geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
+			properties = new Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
+			features.add(new Feature(geometry, properties));
 		}
-		l.log("# of features: " + records.size());
+//		l.log("# of features: " + features.size());
 		geoJson.setFeatures(features);
 		
-		return new GeoJson(GeoJson.Types.FeatureCollection);
+		return geoJson;
 	}
 	
 	/**

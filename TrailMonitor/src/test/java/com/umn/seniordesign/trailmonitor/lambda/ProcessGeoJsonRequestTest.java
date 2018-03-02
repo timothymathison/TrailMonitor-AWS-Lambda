@@ -7,9 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
 import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
+import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.

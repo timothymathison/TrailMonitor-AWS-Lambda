@@ -6,10 +6,10 @@ import java.util.List;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.umn.seniordesign.trailmonitor.entities.GeoJson;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
 import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
+import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
 import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
@@ -45,7 +45,10 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
         }
         
+//        context.getLogger().log("# of features in GeoJson: " + geoJson.getFeatures().size());
+        
 //        List<TrailPointRecord> items = result.getData();
+        context.getLogger().log("Success: " + result.getMessage());
     	return new GetDataResponse<GeoJson>(200, result.getMessage(), geoJson);
 
 //        return "Hello from Lambda! Here are the params I received from " + request.getSourceIp() +": " + params;

@@ -23,7 +23,7 @@ public class GetDataResponse<datatype> {
 		this.message = message;
 		if(data != null) {
 			this.data = data;
-			this.type = data.getClass().getSimpleName();
+			this.type = data.getClass().getSimpleName().toLowerCase();
 		}
 		
 		//if status anything besides default (200 - OK) must through exception for API to notice
