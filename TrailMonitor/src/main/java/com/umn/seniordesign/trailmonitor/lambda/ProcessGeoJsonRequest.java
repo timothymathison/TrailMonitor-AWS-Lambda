@@ -52,7 +52,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         	else {
         		context.getLogger().log("Query Timeout: Not enough time to query for all requested tiles"); //logged in cloud watch
             	return new GetDataResponse<GeoJson>(400, "Error Retrieving GeoJson data: Query Timeout (Not enough time to query for all requested tiles)",
-            			null);
+            			new GeoJson(GeoJson.Types.FeatureCollection));
         	}
         	
         }

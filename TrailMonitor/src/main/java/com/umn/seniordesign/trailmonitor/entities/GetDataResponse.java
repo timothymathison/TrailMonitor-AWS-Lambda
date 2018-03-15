@@ -62,6 +62,6 @@ public class GetDataResponse<datatype> {
 
 	public String toString() {
 		return "{\"message\": \"" + this.message + "\", \"status\": \"" + this.status + "\", \"type\": \"" + this.type + "\""
-				+ (this.data != null ? ", \"data\": " + this.data.toString() : "") + "}";
+				+ (this.data != null ? ", \"data\": \"" + this.data.toString() + "\"" : "") + "}";
 	}
 }
