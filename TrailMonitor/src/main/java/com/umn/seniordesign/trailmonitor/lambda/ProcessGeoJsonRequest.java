@@ -40,6 +40,11 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         	context.getLogger().log("Bad Request: missing or invalid GPS limit parameters");
         	return new GetDataResponse<GeoJson>(400, "Missing or invalid GPS limit parameters", null);
         }
+        //check # of requested tiles against maximum (somewhat arbitrary) that should be queried in one request
+        else if(tiles.size() > 2000) {
+        	context.getLogger().log("Bad Request: too many tiles requested");
+        	return new GetDataResponse<GeoJson>(400, "Data request for too large of an area, try requesting fewer tiles at a time", null);
+        }
         
         //query database
         DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(tiles, startTime, context);
@@ -47,7 +52,6 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         	if(!result.getMessage().equals("Query Timeout")) {
         		context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
             	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", null);
-            	//TODO: figure out why returning "new GeoJson(GeoJson.Types.FeatureCollection)" messes up return object api mapping
         	}
         	else {
         		context.getLogger().log("Query Timeout: Not enough time to query for all requested tiles"); //logged in cloud watch
