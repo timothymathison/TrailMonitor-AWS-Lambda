@@ -42,10 +42,19 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         }
         
         //query database
-        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(tiles, startTime);
+        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(tiles, startTime, context);
         if(!result.isSuccess()) {
-        	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
-        	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", new GeoJson(GeoJson.Types.FeatureCollection));
+        	if(!result.getMessage().equals("Query Timeout")) {
+        		context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
+            	return new GetDataResponse<GeoJson>(500, "Error Retrieving GeoJson data", null);
+            	//TODO: figure out why returning "new GeoJson(GeoJson.Types.FeatureCollection)" messes up return object api mapping
+        	}
+        	else {
+        		context.getLogger().log("Query Timeout: Not enough time to query for all requested tiles"); //logged in cloud watch
+            	return new GetDataResponse<GeoJson>(400, "Error Retrieving GeoJson data: Query Timeout (Not enough time to query for all requested tiles)",
+            			null);
+        	}
+        	
         }
         
         //convert trail records to GeoJson data
