@@ -1,4 +1,4 @@
-# Trail Monitor AWS Service
+# Trail Monitor AWS Cloud Service
 ---
 ## Summary
 
@@ -158,3 +158,5 @@ To come.
 - [AWS API Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
 - [AWS API Gateway Template Mapping](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 - [AWS DynamoDB Java Data Mapping](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
+- [GeoJson](http://geojson.org/)
+- [GeoJson Wiki](http://wiki.geojson.org/GeoJSON_draft_version_6)
