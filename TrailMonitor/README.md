@@ -28,6 +28,7 @@ Data collection is done by the on-vehicle device designed as part of the same pr
 Method: `POST`
 
 URL (Development): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
+
 URL (Production): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor/trail-data`
 
 Header(s): 
@@ -114,9 +115,9 @@ The handler methods are the entry points for each Lambda function, and will be i
 
 ---
 
-Each Lambda function can be tested localy using these steps (example for `ProcessDataFromPost` handler):
+Each Lambda function code can be tested localy using these steps (example for `ProcessDataFromPost` handler):
 
-- Open up ProcessDataFromPostTest.java
+- Open up __ProcessDataFromPostTest.java__
 - Fill in your test logic to validate the input and output of your function handler
 - Then run it locally as a normal JUnit test.
 - The unit test provides a sample JSON input file if you have chosen a predefined event type as your function input
@@ -139,7 +140,7 @@ To Invoke Lambda Function in cloud (from Eclipes):
 - Click __Invoke__ and check the output of your function in the Eclipse Console View
 
 
-__Note:__ Function should also be tested via the __API Gateway__ interface, and final testing should be done using the API url above.
+__Note:__ Function should also be tested via the __API Gateway__ interface, and final testing should be done using the __API URL__ above.
 
 ---
 
@@ -152,8 +153,8 @@ To come.
 ## Resources
 
 - [AWS Web Console Login](https://640567404774.signin.aws.amazon.com/console)
-- [Getting started with AWS-Lambda](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html#getting-started-prerequisites)
 - [AWS Lambda Developer Guide](http://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
-- [AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
+- [Getting started with AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html#getting-started-prerequisites)
+- [AWS API Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
 - [AWS API Gateway Template Mapping](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 - [AWS DynamoDB Java Data Mapping](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
