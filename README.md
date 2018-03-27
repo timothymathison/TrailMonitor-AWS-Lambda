@@ -78,7 +78,7 @@ Required:
 
 Recommended:
 - [IDE - Eclipse Oxygen](http://www.eclipse.org/downloads/)
-- [AWS Toolkit for Eclipse](https://aws.amazon.com/eclipse/)
+- [AWS Toolkit for Eclipse](https://aws.amazon.com/eclipse/) (Retreive access keys by creating user in IAM console)
 
 
 ## Deployment and Testing
