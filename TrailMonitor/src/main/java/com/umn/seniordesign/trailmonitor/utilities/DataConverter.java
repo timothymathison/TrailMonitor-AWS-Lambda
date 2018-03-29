@@ -26,7 +26,7 @@ public class DataConverter {
 	 * @return TrailPointRecord class object
 	 * @throws Exception Invalid data
 	 */
-	public static TrailPointRecord makeRecord(TrailPoint data, long deviceId) throws Exception {
+	public static TrailPointRecord makeRecord(TrailPoint data, String deviceId) throws Exception {
 		if(!data.valid()) { //check validity and completeness of data
 			throw new Exception("Missing or invalid data");
 		}
@@ -47,7 +47,7 @@ public class DataConverter {
 	 * @return List of TrailPointRecord objects
 	 * @throws Exception Thrown if data is in-valid
 	 */
-	public static List<TrailPointRecord> makeRecords(List<TrailPoint> data, long deviceId) throws Exception {
+	public static List<TrailPointRecord> makeRecords(List<TrailPoint> data, String deviceId) throws Exception {
 		List<TrailPointRecord> records = new LinkedList<TrailPointRecord>();
 		Iterator<TrailPoint> iterator = data.iterator();
 		
@@ -76,7 +76,7 @@ public class DataConverter {
 		while(iterator.hasNext()) { //iterate through trail records and create features
 			record = iterator.next();
 			geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
-			properties = new Properties(record.getValue().intValue(), record.getDeviceId().intValue(), record.getTimeStamp().getTimeInMillis());
+			properties = new Properties(record.getValue().intValue(), record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
 			features.add(new Feature(geometry, properties));
 		}
 		geoJson.setFeatures(features);
