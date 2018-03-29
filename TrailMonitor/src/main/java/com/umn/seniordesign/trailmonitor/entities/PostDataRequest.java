@@ -4,14 +4,14 @@ import java.util.List;
 
 public class PostDataRequest {
 	
-	private Long deviceId;
+	private String deviceId;
 	private List<TrailPoint> data;
 	
-	public Long getDeviceId() {
+	public String getDeviceId() {
 		return this.deviceId;
 	}
 	
-	public void setDeviceId(Long deviceId) {
+	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
 	}
 	
