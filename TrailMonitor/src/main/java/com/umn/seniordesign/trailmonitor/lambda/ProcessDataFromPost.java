@@ -40,7 +40,7 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
         	return new PostDataResponse(400, e.getMessage());
         }
         
-        DatabaseTaskResult<Object> result = DatabaseTask.saveItems(records);  //save to database
+        DatabaseTaskResult<Object> result = DatabaseTask.savePoints(records);  //save to database
         if(!result.isSuccess()) {
         	context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch
         	return new PostDataResponse(500, "Error saving data");

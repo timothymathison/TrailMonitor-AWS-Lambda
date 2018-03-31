@@ -47,7 +47,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         }
         
         //query database
-        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readItems(tiles, startTime, context);
+        DatabaseTaskResult<List<TrailPointRecord>> result = DatabaseTask.readPoints(tiles, startTime, context);
         if(!result.isSuccess()) {
         	if(!result.getMessage().equals("Query Timeout")) {
         		context.getLogger().log("Internal Server Error: " + result.getMessage()); //logged in cloud watch

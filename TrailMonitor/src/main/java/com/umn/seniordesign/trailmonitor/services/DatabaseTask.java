@@ -25,7 +25,7 @@ public class DatabaseTask {
 	 * @param dataPoints - List of TrailPointRecord class objects
 	 * @return DatabaseTaskResult class object indicating success and containing return data (if any)
 	 */
-	public static DatabaseTaskResult<Object> saveItems(List<TrailPointRecord> dataPoints) {
+	public static DatabaseTaskResult<Object> savePoints(List<TrailPointRecord> dataPoints) {
 		try {
 			DynamoDBMapper mapper = new DynamoDBMapper(client);
 			mapper.batchSave(dataPoints);
@@ -42,7 +42,7 @@ public class DatabaseTask {
 	 * @param tileCoordinates - List of integer tile identifiers calculated by {@link #DataConverter.reduceCoordinateDimension}
 	 * @return DatabaseTaskResult class object indicating success and containing return data (if any)
 	 */
-	public static DatabaseTaskResult<List<TrailPointRecord>> readItems(List<Integer> tileCoordinates, Calendar startTime, Context context) {
+	public static DatabaseTaskResult<List<TrailPointRecord>> readPoints(List<Integer> tileCoordinates, Calendar startTime, Context context) {
 		List<TrailPointRecord> items = new LinkedList<TrailPointRecord>();
 		try {
 			DynamoDBMapper mapper = new DynamoDBMapper(client);
