@@ -13,6 +13,7 @@ import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
 import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
+import com.umn.seniordesign.trailmonitor.utilities.GeoJsonBuilder;
 
 public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, GetDataResponse<GeoJson>> {
 
@@ -64,7 +65,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         //convert trail records to GeoJson data
         GeoJson geoJson;
         try {
-        	geoJson = DataConverter.buildGeoJson(result.getData());
+        	geoJson = GeoJsonBuilder.build(result.getData());
         }
         catch(Exception e) { //error encountered building GeoJson data
         	context.getLogger().log("Internal Server Error: " + e.getMessage()); //logged in cloud watch
