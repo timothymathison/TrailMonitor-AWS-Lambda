@@ -60,7 +60,7 @@ public class DataConverter {
 	
 	/**
 	 * <h1>Builds a GeoJson object containing features which can be interpreted and displayed on a map</h2>
-	 * @param records - List containing objects of class type TrailPointRecord
+	 * @param tileRecords - A map of lists each containing objects of class type TrailPointRecord for a particular map tile
 	 * @return Object of class type GeoJson
 	 * @throws Exception Thrown when the GeoJson is improperly built
 	 */
@@ -73,10 +73,10 @@ public class DataConverter {
 		Geometry<Double> geometry;
 		Properties properties;
 		
-		Iterator<List<TrailPointRecord>> tileIterator = tileRecords.values().iterator();
+		Iterator<Map.Entry<Integer,List<TrailPointRecord>>> tileIterator = tileRecords.entrySet().iterator();
 		Iterator<TrailPointRecord> recordIterator;
 		while(tileIterator.hasNext()) { //iterate through tiles, which are each a list of trail records
-			tile = tileIterator.next();
+			tile = tileIterator.next().getValue();
 			recordIterator = tile.iterator();
 			while(recordIterator.hasNext()) { //iterate through trail records and create features
 				record = recordIterator.next();

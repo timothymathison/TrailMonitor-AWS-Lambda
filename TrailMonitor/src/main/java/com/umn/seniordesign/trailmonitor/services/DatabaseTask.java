@@ -44,7 +44,7 @@ public class DatabaseTask {
 	 * @return DatabaseTaskResult class object indicating success and containing return data (if any)
 	 */
 	public static DatabaseTaskResult<Map<Integer, List<TrailPointRecord>>> readPoints(List<Integer> tileCoordinates, Calendar startTime, Context context) {
-		Map<Integer, List<TrailPointRecord>> tileItems = new LinkedHashMap<Integer, List<TrailPointRecord>>();
+		Map<Integer, List<TrailPointRecord>> tileItems = new LinkedHashMap<Integer, List<TrailPointRecord>>(tileCoordinates.size(), 1.0F);
 		Long totalPoints = 0L;
 		try {
 			DynamoDBMapper mapper = new DynamoDBMapper(client);
