@@ -7,13 +7,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
-import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson.Types;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 
@@ -52,11 +50,35 @@ public class GeoJsonBuilder {
 	}
 	
 	public static Map<String, GeoJson> build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
+		//lists of features to be plotted
+		List<Feature> pointFeatures = new LinkedList<Feature>();
+		List<Feature> lineFeatures = new LinkedList<Feature>();
+		
+		Iterator<Map.Entry<Integer,List<TrailPointRecord>>> tileIterator = tileRecords.entrySet().iterator();
+		int divisions;
+		int startDepth;
+		if(zoomDepth == 3) {
+			divisions = 100;
+			startDepth = 1;
+		}
+		else if(zoomDepth == 2) {
+			divisions = 10;
+			startDepth = 1;
+		} else {
+			divisions = 100;
+			startDepth = 0;
+		}
+		while(tileIterator.hasNext()) {
+			Map.Entry<Integer,List<TrailPointRecord>> tile = tileIterator.next();
+			//TODO: get top-bottom-left-right
+			//TODO: process tile
+		}
+		
 		//type "FeatureCollection" which contains a list of features to be plotted
 		GeoJson pointData = new GeoJson(GeoJson.Types.FeatureCollection);
+		pointData.setFeatures(pointFeatures);
 		GeoJson lineData = new GeoJson(GeoJson.Types.FeatureCollection);
-		
-		
+		lineData.setFeatures(lineFeatures);
 		Map<String, GeoJson> processedData = new HashMap<String, GeoJson>(2, 1.0F);
 		processedData.put("pointData", pointData);
 		processedData.put("lineData", lineData);
@@ -66,15 +88,47 @@ public class GeoJsonBuilder {
 	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, 
 			List<TrailPointRecord> points, List<Feature> outPoints, List<Feature> outLines) {
 		
-		double xScale = (right - left) / divisions;
-		double yScale = (top - bot) / divisions;
+		double xScale = (right - left) / divisions; //longitude-distance / division
+		double yScale = (top - bot) / divisions; //latitude-distance / division
 		
 		Bucket[][] grid = new Bucket[divisions][divisions]; //rectangular grid that all points will be mapped into
-		List<Bucket> populatedBuckets = new LinkedList<Bucket>();
+		List<Bucket> populatedBuckets = new LinkedList<Bucket>(); //list of non-empty buckets that have points
+		Iterator<TrailPointRecord> iterRawPoints = points.iterator();
+		
+		int y;
+		int x;
+		while(iterRawPoints.hasNext()) { //place each point in the appropriate bucket based on it's lat and lng
+			TrailPointRecord point = iterRawPoints.next();
+			y = (int)Math.floor((point.getLatitude() - bot) / yScale);
+			x = (int)Math.floor((point.getLongitude() - left) / xScale);
+			
+			if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
+				grid[y][x] = new Bucket(y, x);
+			}
+			grid[y][x].add(point, depth <= 0); //add point to bucket
+			populatedBuckets.add(grid[y][x]);
+		}
+		
+		if(depth <= 0) { //base/deepest depth - compute lines
+			//TODO: compute lines
+		}
+		else {
+			Iterator<Bucket> buckIter = populatedBuckets.iterator();
+			Bucket bucket;
+			double newBot;
+			double newLeft;
+			while(buckIter.hasNext()) {
+				bucket = buckIter.next();
+				newBot = bot + bucket.getY() * yScale;
+				newLeft = left + bucket.getX() * xScale;
+				processArea(newBot + yScale, newBot, newLeft, newLeft + xScale, 100, depth - 1,
+						bucket.getPoints(), outPoints, outLines);
+			}
+		}
 		
 	}
 	
-	private class Bucket {
+	static private class Bucket {
 		private List<TrailPointRecord> points;
 		private int y;
 		private int x;
