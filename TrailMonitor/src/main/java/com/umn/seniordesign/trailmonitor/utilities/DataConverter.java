@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 
@@ -71,6 +72,13 @@ public class DataConverter {
 	 */
 	public static int reduceCoordinateDimension(int longitude, int latitude) {
 		return longitude * 200 + latitude;
+	}
+	
+	//TODO: Document function
+	public static GPSTuple<Double, Double> expandCoordinateDimension(int coord) {
+		Double temp = ((double)coord + 90) / 200;
+		Double lng = Math.floor(temp);
+		return new GPSTuple<Double, Double>(lng, (temp - lng) * 200 - 90);
 	}
 	
 	/**

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
@@ -69,10 +70,19 @@ public class GeoJsonBuilder {
 			divisions = 100;
 			startDepth = 0;
 		}
+		GPSTuple<Double, Double> tileCorner;
 		while(tileIterator.hasNext()) {
 			Map.Entry<Integer,List<TrailPointRecord>> tile = tileIterator.next();
-			//TODO: get top-bottom-left-right
-			//TODO: process tile
+			if(tile.getValue().size() > 0) {
+				//get top-bottom-left-right
+				tileCorner = DataConverter.expandCoordinateDimension(tile.getValue().get(0).getCoordinate());
+				double top = tileCorner.lat + 1;
+				double bot = tileCorner.lat;
+				double left = tileCorner.lng;
+				double right = left + 1;
+				//process tile
+				processArea(top, bot, left, right, divisions, startDepth, tile.getValue(), pointFeatures, lineFeatures);
+			}
 		}
 		
 		//type "FeatureCollection" which contains a list of features to be plotted
