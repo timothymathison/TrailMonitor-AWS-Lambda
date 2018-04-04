@@ -49,6 +49,7 @@ public class GeoJsonBuilder {
 		return geoJson;
 	}
 	
+	//TODO: Document function
 	public static Map<String, GeoJson> build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
 		//lists of features to be plotted
 		List<Feature> pointFeatures = new LinkedList<Feature>();
@@ -85,6 +86,7 @@ public class GeoJsonBuilder {
 		return processedData;
 	}
 	
+	//TODO: Document function
 	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, 
 			List<TrailPointRecord> points, List<Feature> outPoints, List<Feature> outLines) {
 		
