@@ -40,7 +40,7 @@ public class GeoJsonBuilder {
 			while(recordIterator.hasNext()) { //iterate through trail records and create features
 				record = recordIterator.next();
 				geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
-				properties = new Properties(record.getValue().intValue(), record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
+				properties = new Properties(record.getValue().intValue(), 1, record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
 				features.add(new Feature(geometry, properties));
 			}	
 		}
