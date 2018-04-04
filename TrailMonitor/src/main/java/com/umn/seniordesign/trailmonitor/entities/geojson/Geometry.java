@@ -11,8 +11,7 @@ public class Geometry<coordinateType> {
 	
 	public enum GeometryTypes {
 		Point,
-		MultiPoint,
-		LineString, //un-implemented
+		LineString
 		//Incomplete list; can add more
 	}
 	
@@ -32,7 +31,7 @@ public class Geometry<coordinateType> {
 			//TODO: validate coordinates
 		}
 		else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Double.class) {
-			this.type = GeometryTypes.MultiPoint;
+			this.type = GeometryTypes.LineString;
 			//TODO: validate coordinates
 		}
 		else {
