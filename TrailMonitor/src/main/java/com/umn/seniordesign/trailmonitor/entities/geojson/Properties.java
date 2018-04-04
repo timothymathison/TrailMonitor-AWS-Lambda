@@ -29,6 +29,10 @@ public class Properties {
 		return this.value;
 	}
 	
+	public double getTraffic() {
+		return this.traffic;
+	}
+	
 	public Set<String> getDeviceIds() {
 		return this.deviceIds;
 	}

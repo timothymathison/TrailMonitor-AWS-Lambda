@@ -12,7 +12,7 @@ import java.util.Set;
 import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
-import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
+import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 
@@ -24,8 +24,8 @@ public class GeoJsonBuilder {
 	 * @return Object of class type GeoJson
 	 * @throws Exception Thrown when the GeoJson is improperly built
 	 */
-	public static GeoJson build(Map<Integer, List<TrailPointRecord>> tileRecords) throws Exception {
-		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
+	public static GeoJsonTile build(Map<Integer, List<TrailPointRecord>> tileRecords) throws Exception {
+		GeoJsonTile geoJson = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);  
 		//type "FeatureCollection" which contains a list of features to be plotted
 		List<Feature> features = new LinkedList<Feature>();
 		TrailPointRecord record;
@@ -45,13 +45,13 @@ public class GeoJsonBuilder {
 				features.add(new Feature(geometry, properties));
 			}	
 		}
-		geoJson.setFeatures(features);
+		geoJson.setPointData(features);
 		
 		return geoJson;
 	}
 	
 	//TODO: Document function
-	public static Map<String, GeoJson> build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
+	public static Map<String, GeoJsonTile> build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
 		//lists of features to be plotted
 		List<Feature> pointFeatures = new LinkedList<Feature>();
 		List<Feature> lineFeatures = new LinkedList<Feature>();
@@ -86,11 +86,11 @@ public class GeoJsonBuilder {
 		}
 		
 		//type "FeatureCollection" which contains a list of features to be plotted
-		GeoJson pointData = new GeoJson(GeoJson.Types.FeatureCollection);
-		pointData.setFeatures(pointFeatures);
-		GeoJson lineData = new GeoJson(GeoJson.Types.FeatureCollection);
-		lineData.setFeatures(lineFeatures);
-		Map<String, GeoJson> processedData = new HashMap<String, GeoJson>(2, 1.0F);
+		GeoJsonTile pointData = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);
+		pointData.setPointData(pointFeatures);
+		GeoJsonTile lineData = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);
+		lineData.setPointData(lineFeatures);
+		Map<String, GeoJsonTile> processedData = new HashMap<String, GeoJsonTile>(2, 1.0F);
 		processedData.put("pointData", pointData);
 		processedData.put("lineData", lineData);
 		return processedData;
