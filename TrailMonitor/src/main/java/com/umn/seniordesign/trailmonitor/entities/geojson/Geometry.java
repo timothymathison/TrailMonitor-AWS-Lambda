@@ -28,11 +28,9 @@ public class Geometry<coordinateType> {
 		this.coordinates = coordinates;
 		if(coordinates.get(0).getClass() == Double.class) {
 			this.type = GeometryTypes.Point;
-			//TODO: validate coordinates
 		}
 		else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Double.class) {
 			this.type = GeometryTypes.LineString;
-			//TODO: validate coordinates
 		}
 		else {
 			throw new Exception("Un-supported type for GeoJson.Geometry object");
