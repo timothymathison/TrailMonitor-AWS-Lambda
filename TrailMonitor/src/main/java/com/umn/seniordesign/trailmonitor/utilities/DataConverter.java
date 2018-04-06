@@ -2,7 +2,6 @@ package com.umn.seniordesign.trailmonitor.utilities;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,12 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
-import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 
 public class DataConverter {
 
@@ -59,32 +55,6 @@ public class DataConverter {
 	}
 	
 	/**
-	 * <h1>Builds a GeoJson object containing features which can be interpreted and displayed on a map</h2>
-	 * @param records - List containing objects of class type TrailPointRecord
-	 * @return Object of class type GeoJson
-	 * @throws Exception Thrown when the GeoJson is improperly built
-	 */
-	public static GeoJson buildGeoJson(List<TrailPointRecord> records) throws Exception {
-		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
-		//type "FeatureCollection" which contains a list of features to be plotted
-		List<Feature> features = new LinkedList<Feature>();
-		TrailPointRecord record;
-		Geometry<Double> geometry;
-		Properties properties;
-		
-		Iterator<TrailPointRecord> iterator = records.iterator();
-		while(iterator.hasNext()) { //iterate through trail records and create features
-			record = iterator.next();
-			geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
-			properties = new Properties(record.getValue().intValue(), record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
-			features.add(new Feature(geometry, properties));
-		}
-		geoJson.setFeatures(features);
-		
-		return geoJson;
-	}
-	
-	/**
 	 * <h1>Generates a unique linear value (tile identifier/coordinate) for each integer latitude/longitude combination</h1>
 	 * @param longitude - number of type Double representing a GPS longitude value
 	 * @param latitude - number of type Double representing a GPS latitude value
@@ -102,6 +72,13 @@ public class DataConverter {
 	 */
 	public static int reduceCoordinateDimension(int longitude, int latitude) {
 		return longitude * 200 + latitude;
+	}
+	
+	//TODO: Document function
+	public static GPSTuple<Double, Double> expandCoordinateDimension(int coord) {
+		Double temp = ((double)coord + 90) / 200;
+		Double lng = Math.floor(temp);
+		return new GPSTuple<Double, Double>(lng, Math.round((temp - lng) * 200) - 90);
 	}
 	
 	/**

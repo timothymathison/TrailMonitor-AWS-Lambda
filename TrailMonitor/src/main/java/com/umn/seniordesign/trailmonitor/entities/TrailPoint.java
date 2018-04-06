@@ -40,7 +40,8 @@ public class TrailPoint {
 	}
 	
 	public boolean valid() { //checks the validity and completeness of this object
-		return this.timeStamp != null && this.latitude != null && this.longitude != null && this.value != null;
+		return this.timeStamp != null && this.latitude != null && Math.abs(this.latitude) < 90D 
+				&& this.longitude != null && Math.abs(this.longitude) < 180D && this.value != null;
 	}
 	
 	public String toString() {
