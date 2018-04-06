@@ -8,4 +8,22 @@ public class GPSTuple<X, Y> {
 		this.lng = lng;
 		this.lat = lat;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public GPSTuple(X lng, long lat) {
+		this.lng = lng;
+		this.lat = (Y)Long.valueOf(lat);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public GPSTuple(long lng, Y lat) {
+		this.lng = (X)Long.valueOf(lng);
+		this.lat = lat;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public GPSTuple(long lng, long lat) {
+		this.lng = (X)Long.valueOf(lng);
+		this.lat = (Y)Long.valueOf(lat);
+	}
 }

@@ -1,7 +1,6 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
+import com.umn.seniordesign.trailmonitor.entities.GeoTrailInfo;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
@@ -19,84 +19,129 @@ import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 public class GeoJsonBuilder {
 
 	/**
-	 * <h1>Builds a GeoJson object containing features which can be interpreted and displayed on a map</h2>
+	 * <h1>Builds a GeoTrailInfo object containing GeoJsonTiles with features that can be displayed on a map</h2>
 	 * @param tileRecords - A map of lists each containing objects of class type TrailPointRecord for a particular map tile
-	 * @return Object of class type GeoJson
-	 * @throws Exception Thrown when the GeoJson is improperly built
+	 * @return Object of class type {@link #GeoTrailInfo}
+	 * @throws Exception Thrown if a GeoJsonTile is improperly built
 	 */
-	public static GeoJsonTile build(Map<Integer, List<TrailPointRecord>> tileRecords) throws Exception {
-		GeoJsonTile geoJson = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);  
-		//type "FeatureCollection" which contains a list of features to be plotted
-		List<Feature> features = new LinkedList<Feature>();
+	public static GeoTrailInfo build(Map<Integer, List<TrailPointRecord>> tileRecords) throws Exception {
+		List<GeoJsonTile> geoJsonTiles = new LinkedList<GeoJsonTile>();
+		
+		Map.Entry<Integer,List<TrailPointRecord>> tileRecord;
 		TrailPointRecord record;
-		List<TrailPointRecord> tile;
+		List<TrailPointRecord> records;
+		GeoJsonTile tile;
+		List<Feature> features;
 		Geometry<Double> geometry;
 		Properties properties;
 		
 		Iterator<Map.Entry<Integer,List<TrailPointRecord>>> tileIterator = tileRecords.entrySet().iterator();
 		Iterator<TrailPointRecord> recordIterator;
 		while(tileIterator.hasNext()) { //iterate through tiles, which are each a list of trail records
-			tile = tileIterator.next().getValue();
-			recordIterator = tile.iterator();
+			tileRecord = tileIterator.next();
+			records = tileRecord.getValue();
+			recordIterator = records.iterator();
+			features = new LinkedList<Feature>(); //create new list of features for current tile
 			while(recordIterator.hasNext()) { //iterate through trail records and create features
 				record = recordIterator.next();
 				geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
 				properties = new Properties(record.getValue().intValue(), 1, record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
 				features.add(new Feature(geometry, properties));
-			}	
+			}
+			//create GeoJsonTile and assign features to it
+			tile = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection, 
+					DataConverter.expandCoordinateDimension(tileRecord.getKey()));
+			tile.setPointData(features);
+			geoJsonTiles.add(tile); //add to list of processed tiles
 		}
-		geoJson.setPointData(features);
+		GeoTrailInfo geoTrailInfo = new GeoTrailInfo(geoJsonTiles);
 		
-		return geoJson;
+		return geoTrailInfo;
 	}
 	
-	//TODO: Document function
-	public static Map<String, GeoJsonTile> build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
-		//lists of features to be plotted
-		List<Feature> pointFeatures = new LinkedList<Feature>();
-		List<Feature> lineFeatures = new LinkedList<Feature>();
+	/**
+	 * <h1>Processes TrailPointRecords and builds a GeoTrailInfo object containing GeoJsonTiles 
+	 * with features that can be displayed on a map.</h2>
+	 * Calls {@link #GeoJsonBuilder}.processArea() to process raw points and produce a depiction of trail conditions.
+	 * Output detail depends on requested zoomDepth. At highest zoomDepth, function produces both point and line features.
+	 * @param tileRecords - A map of lists each containing objects of class type {@link #TrailPointRecord} for a particular map tile
+	 * @param zoomDepth - Used to determine processing detail (2 -> highest detail, 0 -> lowest detail)
+	 * @return Object of class type {@link #GeoTrailInfo}
+	 * @throws Exception Thrown if called with invalid zoomDepth or a GeoJsonTile is improperly built
+	 */
+	public static GeoTrailInfo build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
 		
-		Iterator<Map.Entry<Integer,List<TrailPointRecord>>> tileIterator = tileRecords.entrySet().iterator();
+		//calculations for determining how to process data
 		int divisions;
 		int startDepth;
-		if(zoomDepth == 3) {
+		if(zoomDepth == 2) { // tile divided into 10,000 x 10,000 grid, each bucket is roughly 36 x 36 feet
 			divisions = 100;
 			startDepth = 1;
 		}
-		else if(zoomDepth == 2) {
+		else if(zoomDepth == 1) { // tile divided into 1,000 x 100 grid
 			divisions = 10;
 			startDepth = 1;
-		} else {
+		}
+		else if(zoomDepth == 0) { // tile divided into 100 x 100 grid
 			divisions = 100;
 			startDepth = 0;
 		}
+		else {
+			throw new Exception("Invalid zoomDepth sent to GeoTrailInfo build function, must be in range 1-3");
+		}
+		String zoomRange = GeoTrailInfo.availableZoomRanges.get(zoomDepth);
+		
+		//declarations for iterating
+		Map.Entry<Integer,List<TrailPointRecord>> tileRecord;
+		Iterator<Map.Entry<Integer,List<TrailPointRecord>>> tileIterator = tileRecords.entrySet().iterator();
+		
+		List<GeoJsonTile> geoJsonTiles = new LinkedList<GeoJsonTile>(); //list of GeoJsonTiles that will be returned
+		
+		//temp variable declarations
+		GeoJsonTile tile;
 		GPSTuple<Double, Double> tileCorner;
+		//lists of features to be plotted
+		List<Feature> pointFeatures;
+		List<Feature> lineFeatures;
 		while(tileIterator.hasNext()) {
-			Map.Entry<Integer,List<TrailPointRecord>> tile = tileIterator.next();
-			if(tile.getValue().size() > 0) {
+			tileRecord = tileIterator.next();
+			if(tileRecord.getValue().size() > 0) {
 				//get top-bottom-left-right
-				tileCorner = DataConverter.expandCoordinateDimension(tile.getValue().get(0).getCoordinate());
+				tileCorner = DataConverter.expandCoordinateDimension(tileRecord.getValue().get(0).getCoordinate());
 				double top = tileCorner.lat + 1;
 				double bot = tileCorner.lat;
 				double left = tileCorner.lng;
 				double right = left + 1;
+				
+				//create new tile, type FeatureCollection
+				tile = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection, tileCorner, zoomRange);
+				pointFeatures = new LinkedList<Feature>();
+				lineFeatures = new LinkedList<Feature>();
 				//process tile
-				processArea(top, bot, left, right, divisions, startDepth, tile.getValue(), pointFeatures, lineFeatures);
+				processArea(top, bot, left, right, divisions, startDepth, tileRecord.getValue(), pointFeatures, lineFeatures);
+				tile.setPointData(pointFeatures);
+				tile.setLineData(lineFeatures);
+				geoJsonTiles.add(tile);
 			}
 		}
 		
-		//type "FeatureCollection" which contains a list of features to be plotted
-		GeoJsonTile pointData = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);
-		pointData.setPointData(pointFeatures);
-		GeoJsonTile lineData = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection);
-		lineData.setPointData(lineFeatures);
-		Map<String, GeoJsonTile> processedData = new HashMap<String, GeoJsonTile>(2, 1.0F);
-		processedData.put("pointData", pointData);
-		processedData.put("lineData", lineData);
-		return processedData;
+		return new GeoTrailInfo(zoomRange, geoJsonTiles);
 	}
 	
-	//TODO: Document function
+	/**
+	 * <h2>Maps all trail points into buckets contained within a grid system, and combines points which are mapped to the same bucket.</h2>
+	 * Depending on requested depth, function will execute recursively to increase the detail (higher depth = more recursive calls)
+	 * At every recursive call, depth decreases by 1 until it reaches 0
+	 * @param top
+	 * @param bot
+	 * @param left
+	 * @param right
+	 * @param divisions
+	 * @param depth
+	 * @param points
+	 * @param outPoints
+	 * @param outLines
+	 */
 	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, 
 			List<TrailPointRecord> points, List<Feature> outPoints, List<Feature> outLines) {
 		

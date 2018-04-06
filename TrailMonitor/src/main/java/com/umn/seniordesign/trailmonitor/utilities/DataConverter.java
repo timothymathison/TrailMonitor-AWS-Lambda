@@ -78,7 +78,7 @@ public class DataConverter {
 	public static GPSTuple<Double, Double> expandCoordinateDimension(int coord) {
 		Double temp = ((double)coord + 90) / 200;
 		Double lng = Math.floor(temp);
-		return new GPSTuple<Double, Double>(lng, (temp - lng) * 200 - 90);
+		return new GPSTuple<Double, Double>(lng, Math.round((temp - lng) * 200) - 90);
 	}
 	
 	/**

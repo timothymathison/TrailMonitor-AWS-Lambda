@@ -21,8 +21,9 @@ public class GeoJsonTile {
 		//Incomplete list; can add more
 	}
 	
-	public GeoJsonTile(Types type) {
+	public GeoJsonTile(Types type, GPSTuple<Double, Double> cornerCoord) {
 		this.type = type;
+		this.cornerCoordinate = cornerCoord;
 	}
 	
 	public GeoJsonTile(Types type, GPSTuple<Double, Double> cornerCoord, String zoomRange) {

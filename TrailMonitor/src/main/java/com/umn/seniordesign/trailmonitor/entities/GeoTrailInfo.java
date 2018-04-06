@@ -8,15 +8,20 @@ import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
 public class GeoTrailInfo {
 	private List<GeoJsonTile> tiles;
 	private String zoomRange;
-	private static final List<String> availableZoomRanges = Arrays.asList("9-20", "6-9", "2-6");
+	public static final List<String> availableZoomRanges = Arrays.asList("2-6", "6-10", "10-20");
 	
 	public GeoTrailInfo() {
 		this.tiles = null;
 		this.zoomRange = null;
 	}
 	
-	public GeoTrailInfo(String zoomSpan, List<GeoJsonTile> tiles) {
-		this.zoomRange = zoomSpan;
+	public GeoTrailInfo(List<GeoJsonTile> tiles) {
+		this.tiles = tiles;
+		this.zoomRange = null;
+	}
+	
+	public GeoTrailInfo(String zoomRange, List<GeoJsonTile> tiles) {
+		this.zoomRange = zoomRange;
 		this.tiles = tiles;
 	}
 	
