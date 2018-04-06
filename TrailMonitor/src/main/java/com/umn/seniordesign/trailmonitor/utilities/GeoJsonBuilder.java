@@ -32,6 +32,7 @@ public class GeoJsonBuilder {
 		List<TrailPointRecord> records;
 		GeoJsonTile tile;
 		List<Feature> features;
+		long featureCount = 0;
 		Geometry<Double> geometry;
 		Properties properties;
 		
@@ -47,6 +48,7 @@ public class GeoJsonBuilder {
 				geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
 				properties = new Properties(record.getValue().intValue(), 1, record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
 				features.add(new Feature(geometry, properties));
+				featureCount++;
 			}
 			//create GeoJsonTile and assign features to it
 			tile = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection, 
@@ -54,7 +56,7 @@ public class GeoJsonBuilder {
 			tile.setPointData(features);
 			geoJsonTiles.add(tile); //add to list of processed tiles
 		}
-		GeoTrailInfo geoTrailInfo = new GeoTrailInfo(geoJsonTiles);
+		GeoTrailInfo geoTrailInfo = new GeoTrailInfo(geoJsonTiles, featureCount);
 		
 		return geoTrailInfo;
 	}
@@ -103,6 +105,7 @@ public class GeoJsonBuilder {
 		//lists of features to be plotted
 		List<Feature> pointFeatures;
 		List<Feature> lineFeatures;
+		long featureCount = 0;
 		while(tileIterator.hasNext()) {
 			tileRecord = tileIterator.next();
 			if(tileRecord.getValue().size() > 0) {
@@ -122,10 +125,11 @@ public class GeoJsonBuilder {
 				tile.setPointData(pointFeatures);
 				tile.setLineData(lineFeatures);
 				geoJsonTiles.add(tile);
+				featureCount += pointFeatures.size() + lineFeatures.size();
 			}
 		}
 		
-		return new GeoTrailInfo(zoomRange, geoJsonTiles);
+		return new GeoTrailInfo(zoomRange, geoJsonTiles, featureCount);
 	}
 	
 	/**
