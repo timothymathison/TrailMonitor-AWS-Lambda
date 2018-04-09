@@ -2,3 +2,4 @@
 .recommenders/
 TrailMonitor/target/
 RemoteSystemsTempFiles/
+/scripts/*.json

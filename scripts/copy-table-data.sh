@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #both input and output tables must have hash key: CompositeCoordinates and sort key: TimeStamp
-if [ $# -lt 3 ]
+if [ $# -lt 2 ]
 then
 	echo "Not enough arguments..."
 	echo "Usage: copy-table-data <input-table> <output-table>"
