@@ -47,10 +47,18 @@ public class ProcessDataFromPost implements RequestHandler<PostDataRequest, Post
         }
         
         //everything worked!
-        PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + data.size() 
-        		+ " trail points were received and saved");
-        response.setEcho(Output(request.getData()));
-        context.getLogger().log("Success: " + result.getMessage()); //logged in cloud watch
+        String echo = Output(request.getData());
+        int numSaved = data.size();
+        String msg = "";
+        if(numSaved == 1) {
+        	msg = "1 trail datapoint was saved";
+        }
+        else {
+        	msg = numSaved + " trail datapoints were saved";
+        }
+        PostDataResponse response = new PostDataResponse(200, "Hello from Lambda! " + msg);
+        response.setEcho(echo);
+        context.getLogger().log("Success: " + msg + ": " + echo); //logged in cloud watch
         return response;
     }
     
