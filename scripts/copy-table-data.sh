@@ -83,7 +83,7 @@ do
 	((i++))
 	((updated++))
 done
-echo "($progress%)"
+echo "(100%)"
 
 rm table-data.json
 rm expression-attribute-values.json
