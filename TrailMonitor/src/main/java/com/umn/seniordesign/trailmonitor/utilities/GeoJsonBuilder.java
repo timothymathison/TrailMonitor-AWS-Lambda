@@ -250,6 +250,10 @@ public class GeoJsonBuilder {
 			return this.y;
 		}
 		
+		public String getId() {
+			return this.id;
+		}
+		
 		public Set<String> getDeviceIds() {
 			return this.deviceIds;
 		}
