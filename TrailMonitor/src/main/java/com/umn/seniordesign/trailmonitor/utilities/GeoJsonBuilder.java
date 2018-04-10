@@ -76,11 +76,13 @@ public class GeoJsonBuilder {
 		//calculations for determining how to process data
 		int divisions;
 		int startDepth;
+		boolean computeLines = false;
 		if(zoomDepth == 2) { // tile divided into 10,000 x 10,000 grid, each bucket is roughly 36 x 36 feet
 			divisions = 100;
 			startDepth = 1;
+			computeLines = true; //zoom is great enough, draw lines between populated buckets
 		}
-		else if(zoomDepth == 1) { // tile divided into 1,000 x 100 grid
+		else if(zoomDepth == 1) { // tile divided into 1,000 x 1,000 grid
 			divisions = 10;
 			startDepth = 1;
 		}
@@ -121,7 +123,7 @@ public class GeoJsonBuilder {
 				pointFeatures = new LinkedList<Feature>();
 				lineFeatures = new LinkedList<Feature>();
 				//process tile
-				processArea(top, bot, left, right, divisions, startDepth, tileRecord.getValue(), pointFeatures, lineFeatures);
+				processArea(top, bot, left, right, divisions, startDepth, computeLines, tileRecord.getValue(), pointFeatures, lineFeatures);
 				tile.setPointData(pointFeatures);
 				tile.setLineData(lineFeatures);
 				geoJsonTiles.add(tile);
@@ -146,7 +148,7 @@ public class GeoJsonBuilder {
 	 * @param outPoints
 	 * @param outLines
 	 */
-	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, 
+	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, boolean drawLines, 
 			List<TrailPointRecord> points, List<Feature> outPoints, List<Feature> outLines) {
 		
 		double xScale = (right - left) / divisions; //longitude-distance / division
@@ -182,7 +184,7 @@ public class GeoJsonBuilder {
 				bucket = buckIter.next();
 				newBot = bot + bucket.getY() * yScale;
 				newLeft = left + bucket.getX() * xScale;
-				processArea(newBot + yScale, newBot, newLeft, newLeft + xScale, 100, depth - 1,
+				processArea(newBot + yScale, newBot, newLeft, newLeft + xScale, 100, depth - 1, drawLines,
 						bucket.getPoints(), outPoints, outLines);
 			}
 		}
@@ -193,16 +195,21 @@ public class GeoJsonBuilder {
 		private List<TrailPointRecord> points;
 		private int y;
 		private int x;
+		private String id;
 		private double totalValues;
 		private Set<String> deviceIds;
-		private long timeStamp;
+		private Set<String> connectedBucketIds; //ids of buckets that have connecting lines to this bucket
+		private long oldestTime;
+		private long latestTime;
 		
 		public Bucket(int latIndex, int lngIndex) {
 			this.points = new LinkedList<TrailPointRecord>();
 			this.y = latIndex;
 			this.x = lngIndex;
+			this.id = String.valueOf(this.y) + String.valueOf(this.x);
 			this.totalValues = 0;
-			this.timeStamp = 0;
+			this.oldestTime = 0;
+			this.latestTime = Long.MAX_VALUE;
 		}
 		
 		public void add(TrailPointRecord point, boolean process) {
@@ -214,8 +221,11 @@ public class GeoJsonBuilder {
 				}
 				this.deviceIds.add(point.getDeviceId());
 				long time = point.getTimeStamp().getTimeInMillis();
-				if(this.timeStamp < time) {
-					this.timeStamp = time;
+				if(this.oldestTime > time) {
+					this.oldestTime = time;
+				}
+				if(this.latestTime < time) {
+					this.latestTime = time;
 				}
 			}
 		}
@@ -244,8 +254,26 @@ public class GeoJsonBuilder {
 			return this.deviceIds;
 		}
 		
-		public long getTimeStamp() {
-			return this.timeStamp;
+		public long getOldestTime() {
+			return this.oldestTime;
+		}
+		
+		public long getLatestTime() {
+			return this.latestTime;
+		}
+		
+		public void setConnected(String bucketId) {
+			if(this.connectedBucketIds == null) {
+				this.connectedBucketIds = new HashSet<String>(8, 1.0F);
+			}
+			this.connectedBucketIds.add(bucketId);
+		}
+		
+		public boolean isConnected(String bucketId) {
+			if(this.connectedBucketIds == null) {
+				return false;
+			}
+			return this.connectedBucketIds.contains(bucketId);
 		}
 		
 	}
