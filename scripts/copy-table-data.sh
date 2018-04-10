@@ -9,6 +9,13 @@ then
 	exit 1
 fi
 
+if [ -n "$3" ]
+then 
+	timeFilter=$3 #text to match timestamp against
+else
+	timeFilter=Z #will match any timestamp
+fi
+
 inputTable=$1
 outputTable=$2
 
@@ -36,6 +43,8 @@ put="SET #Lo = :lo, #La = :la, #DI = :di, #Co = :co, #Va = :v"
 i=0
 end=$count
 progress=0
+updated=0
+skipped=0
 while [ $i -lt $end ]
 do
 	# key of item to update
@@ -44,6 +53,14 @@ do
 
 	CompCoord="$(echo $items | jq ".[$i].CompositeCoordinates")"
 	TimeStamp="$(echo $items | jq ".[$i].TimeStamp")"
+	timeMatch="$(echo $TimeStamp | grep "$timeFilter")"
+	if [ -z "$timeMatch" ] #skip if doesn't match
+	then
+		((skipped++))
+		((i++))
+		continue 
+	fi
+
 	Longitude="$(echo $items | jq ".[$i].Longitude")"
 	Latitude="$(echo $items | jq ".[$i].Latitude")"
 	DeviceId="$(echo $items | jq ".[$i].DeviceId")"
@@ -64,6 +81,7 @@ do
 
 	aws dynamodb update-item --table-name $2 --key file://key.json --update-expression "$put" --expression-attribute-names file://expression-attribute-names.json --expression-attribute-values file://expression-attribute-values.json
 	((i++))
+	((updated++))
 done
 echo "($progress%)"
 
@@ -73,4 +91,5 @@ rm expression-attribute-names.json
 rm key.json
 
 echo "done updating table"
-echo "$i items updated"
+echo "$updated items updated"
+echo "$skipped items skipped"
