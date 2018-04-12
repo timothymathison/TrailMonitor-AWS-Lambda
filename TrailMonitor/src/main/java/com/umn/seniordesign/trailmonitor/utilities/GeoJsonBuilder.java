@@ -168,9 +168,8 @@ public class GeoJsonBuilder {
 		//(top - bot) / divisions
 		BigDecimal yScale = top.subtract(bot).divide(new BigDecimal(divisions)); //latitude-distance / division
 		
-		int y;
-		int x;
-		GPSTuple buckCenter;
+		int y = 0;
+		int x = 0;
 		while(iterRawPoints.hasNext()) { //place each point in the appropriate bucket based on it's lat and lng
 			TrailPointRecord point = iterRawPoints.next();
 			
@@ -183,9 +182,6 @@ public class GeoJsonBuilder {
 						.divide(xScale).doubleValue());
 				
 				if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
-					// center = left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5
-//					buckCenter = new GPSTuple(left.doubleValue() + x * xScale.doubleValue() + xScale.doubleValue() * 0.5,
-//							bot.doubleValue() + y * yScale.doubleValue() + yScale.doubleValue() * 0.5);
 					grid[y][x] = new Bucket(y, x);
 					populatedBuckets.add(grid[y][x]);
 				}
@@ -209,14 +205,22 @@ public class GeoJsonBuilder {
 			while(buckIter.hasNext()) {
 				bucket = buckIter.next();
 				center = bucket.getAvgCenter();
+				
+				//compute combined points
 				geometry = new Geometry<Double>(Arrays.asList(center.lng, center.lat));
 				properties = new Properties(bucket.getValue(), bucket.size(), bucket.getDeviceIds(), bucket.getOldestTime());
 				feature = new Feature(geometry, properties);
 				outPoints.add(feature);
+				
+				//TODO: compute lines
+				if(drawLines) {
+					Bucket otherBucket;
+					if(x != 0) { //bucket is not by the left edge of the current processing area
+						
+					}
+				}
 			}
-			
-			//TODO: compute lines
-			
+				
 		}
 		else {
 			BigDecimal newBot;
@@ -334,6 +338,48 @@ public class GeoJsonBuilder {
 			return this.connectedBucketIds.contains(bucketId);
 		}
 		
+		/**
+		 * <h1>Determines if this bucket and another bucket should be connected, based on the points contained within each</h2>
+		 * @param otherBucket - other bucket to consider connecting
+		 * @return GeoJson {@link #Feature} linestring object which connects both buckets, or null if not to be connected
+		 */
+		public Feature connectBucket(Bucket otherBucket) throws Exception {
+			if(!this.isConnected(otherBucket.getId())) {
+				Iterator<String> iterator = this.deviceIds.iterator();
+				Set<String> otherBuckDeviceIds = otherBucket.getDeviceIds();
+				while(iterator.hasNext()) {
+					if(otherBuckDeviceIds.contains(iterator.next())) { //this bucket and other bucket have points from same device
+						GPSTuple thisCenter = this.getAvgCenter();
+						GPSTuple otherCenter = otherBucket.getAvgCenter();
+						Geometry geometry = new Geometry<List<Double>>(Arrays.asList(Arrays.asList(thisCenter.lng, thisCenter.lat),
+								Arrays.asList(otherCenter.lng, otherCenter.lat)));
+						Properties properties = new Properties((this.getValue() + otherBucket.getValue()) / 2,
+								(this.size() + otherBucket.size()) / 2, combineDeviceIds(this.getDeviceIds(), otherBucket.getDeviceIds()), 
+								Long.max(this.getOldestTime(), otherBucket.getOldestTime()));
+					}
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * <h1>Takes two sets of device ids and returns a new set containing device ids from both, without permuting either
+		 * original set</h1>
+		 * @param arg0 - A set of inner type String
+		 * @param arg1 - A set of inner type String
+		 * @return Set<String> object containing all deviceIds
+		 */
+		static Set<String> combineDeviceIds(Set<String> arg0, Set<String> arg1) {
+			Set<String> ids = new HashSet<String>(arg0.size() + arg1.size(), 1.0F);
+			Iterator<String> iterator = arg0.iterator();
+			while(iterator.hasNext()) {
+				ids.add(iterator.next());
+			}
+			iterator = arg1.iterator();
+			while(iterator.hasNext()) {
+				ids.add(iterator.next());
+			}
+			return ids;
+		}
 	}
-
 }
