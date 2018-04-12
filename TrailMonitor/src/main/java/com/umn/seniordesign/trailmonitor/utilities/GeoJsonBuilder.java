@@ -184,9 +184,9 @@ public class GeoJsonBuilder {
 				
 				if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
 					// center = left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5
-					buckCenter = new GPSTuple(left.doubleValue() + x * xScale.doubleValue() + xScale.doubleValue() * 0.5,
-							bot.doubleValue() + y * yScale.doubleValue() + yScale.doubleValue() * 0.5);
-					grid[y][x] = new Bucket(y, x, buckCenter);
+//					buckCenter = new GPSTuple(left.doubleValue() + x * xScale.doubleValue() + xScale.doubleValue() * 0.5,
+//							bot.doubleValue() + y * yScale.doubleValue() + yScale.doubleValue() * 0.5);
+					grid[y][x] = new Bucket(y, x);
 					populatedBuckets.add(grid[y][x]);
 				}
 				
@@ -208,7 +208,7 @@ public class GeoJsonBuilder {
 			Feature feature;
 			while(buckIter.hasNext()) {
 				bucket = buckIter.next();
-				center = bucket.getCenter();
+				center = bucket.getAvgCenter();
 				geometry = new Geometry<Double>(Arrays.asList(center.lng, center.lat));
 				properties = new Properties(bucket.getValue(), bucket.size(), bucket.getDeviceIds(), bucket.getOldestTime());
 				feature = new Feature(geometry, properties);
@@ -238,19 +238,23 @@ public class GeoJsonBuilder {
 		private int y;
 		private int x;
 		private String id;
-		private GPSTuple center;
+//		private GPSTuple center;
+		private double totalLat;
+		private double totalLng;
 		private double totalValues;
 		private Set<String> deviceIds;
 		private Set<String> connectedBucketIds; //ids of buckets that have connecting lines to this bucket
 		private long oldestTime;
 		private long latestTime;
 		
-		public Bucket(int latIndex, int lngIndex, GPSTuple center) {
+		public Bucket(int latIndex, int lngIndex) {
 			this.points = new LinkedList<TrailPointRecord>();
 			this.y = latIndex;
 			this.x = lngIndex;
 			this.id = String.valueOf(this.y) + String.valueOf(this.x);
-			this.center = center;
+//			this.center = center;
+			this.totalLat = 0;
+			this.totalLng = 0;
 			this.totalValues = 0;
 			this.oldestTime = Long.MAX_VALUE;
 			this.latestTime = 0;
@@ -259,6 +263,8 @@ public class GeoJsonBuilder {
 		public void add(TrailPointRecord point, boolean process) {
 			this.points.add(point);
 			if(process) { //combine information from all points in bucket
+				this.totalLat += point.getLatitude();
+				this.totalLng += point.getLongitude();
 				this.totalValues += point.getValue();
 				if(deviceIds == null) {
 					this.deviceIds = new HashSet<String>(50, 1.0F);
@@ -298,8 +304,8 @@ public class GeoJsonBuilder {
 			return this.id;
 		}
 		
-		public GPSTuple getCenter() {
-			return this.center;
+		public GPSTuple getAvgCenter() {
+			return new GPSTuple(this.totalLng / this.size(), this.totalLat / this.size());
 		}
 		
 		public Set<String> getDeviceIds() {
