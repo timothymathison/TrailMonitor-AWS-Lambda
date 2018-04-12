@@ -13,6 +13,7 @@ import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTask;
 import com.umn.seniordesign.trailmonitor.services.DatabaseTaskResult;
+import com.umn.seniordesign.trailmonitor.utilities.ContextHolder;
 import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
 import com.umn.seniordesign.trailmonitor.utilities.GeoJsonBuilder;
 
@@ -21,6 +22,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
     @Override
     public GetDataResponse<GeoTrailInfo> handleRequest(GetDataRequest request, Context context) {
     	Map<String, String> params = request.getParams();
+    	ContextHolder.setContext(context); //make context available to entire execution
     	LambdaLogger logger = context.getLogger();
         logger.log("Request from IP: " + request.getSourceIp() + " with params: " 
         		+ (params != null ? params.toString() : "none")); //logged to cloud watch

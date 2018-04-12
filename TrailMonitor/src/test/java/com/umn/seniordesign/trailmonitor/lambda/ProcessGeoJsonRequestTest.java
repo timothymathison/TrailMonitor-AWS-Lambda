@@ -1,6 +1,8 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -21,7 +23,15 @@ public class ProcessGeoJsonRequestTest {
     @BeforeClass
     public static void createInput() throws IOException {
         //set up your sample input object here.
-        input = null;
+        input = new GetDataRequest();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("lim-top", "45");
+        params.put("lim-left", "-95");
+        params.put("lim-bot", "44");
+        params.put("lim-right", "-93");
+        params.put("start-time", "0");
+        params.put("zoom", "5");
+        input.setParams(params);
     }
 
     private Context createContext() {

@@ -124,7 +124,9 @@ public class GeoJsonBuilder {
 				double bot = tileCorner.lat;
 				double left = tileCorner.lng;
 				double right = left + 1;
-				
+				ContextHolder.getContext().getLogger().log("bot: " + bot + ", left: " + left + ", top: " + top + ", right: " + right +
+						", (top - bot) / divisions: " + (top - bot) / divisions + ", (44.4 - bot) / 0.1: " +
+						(44.4D - bot) / 0.1D);
 				//process tile
 				processArea(top, bot, left, right, divisions, startDepth, computeLines, tileRecord.getValue(), pointFeatures, lineFeatures);
 				featureCount += pointFeatures.size() + lineFeatures.size();
@@ -167,10 +169,15 @@ public class GeoJsonBuilder {
 			TrailPointRecord point = iterRawPoints.next();
 			y = (int)Math.floor((point.getLatitude() - bot) / yScale);
 			x = (int)Math.floor((point.getLongitude() - left) / xScale);
-			
-			if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
-				grid[y][x] = new Bucket(y, x, new GPSTuple(left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5));
-				populatedBuckets.add(grid[y][x]);
+			try {
+				if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
+					grid[y][x] = new Bucket(y, x, new GPSTuple(left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5));
+					populatedBuckets.add(grid[y][x]);
+				}
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				throw new Exception("Array index out of bounds: " + e.getMessage() + ", x: " + x + ", y: " + y +
+						", bot: " + bot + ", left: " + left + ", yScale" + yScale + ", lat: " + point.getLatitude());
 			}
 			grid[y][x].add(point, depth <= 0); //add point to bucket
 		}

@@ -9,19 +9,16 @@ public class GPSTuple {
 		this.lat = lat;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public GPSTuple(double lng, long lat) {
 		this.lng = lng;
 		this.lat = Long.valueOf(lat).doubleValue();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public GPSTuple(long lng, Double lat) {
 		this.lng = Long.valueOf(lng).doubleValue();
 		this.lat = lat;
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public GPSTuple(long lng, long lat) {
 		this.lng = Long.valueOf(lng).doubleValue();
 		this.lat = Long.valueOf(lat).doubleValue();

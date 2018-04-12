@@ -3,8 +3,6 @@ package com.umn.seniordesign.trailmonitor.entities;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.impl.AvalonLogger;
-
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
 
 public class GeoTrailInfo {
