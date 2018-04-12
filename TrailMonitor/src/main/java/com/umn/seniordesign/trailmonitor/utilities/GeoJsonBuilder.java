@@ -1,5 +1,6 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -120,13 +121,14 @@ public class GeoJsonBuilder {
 			lineFeatures = new LinkedList<Feature>();
 			if(tileRecord.getValue().size() > 0) {
 				//get top-bottom-left-right
-				double top = tileCorner.lat + 1;
-				double bot = tileCorner.lat;
-				double left = tileCorner.lng;
-				double right = left + 1;
-				ContextHolder.getContext().getLogger().log("bot: " + bot + ", left: " + left + ", top: " + top + ", right: " + right +
-						", (top - bot) / divisions: " + (top - bot) / divisions + ", (44.4 - bot) / 0.1: " +
-						(44.4D - bot) / 0.1D);
+				// using big decimal to maintain accuracy when top-bottom-left-right are calculated recursively
+				BigDecimal top = new BigDecimal(tileCorner.lat + 1);
+				BigDecimal bot = new BigDecimal(tileCorner.lat);
+				BigDecimal left = new BigDecimal(tileCorner.lng);
+				BigDecimal right = new BigDecimal(tileCorner.lng + 1);
+//				ContextHolder.getContext().getLogger().log("bot: " + bot + ", left: " + left + ", top: " + top + ", right: " + right +
+//						", (top - bot) / divisions: " + (top - bot) / divisions + ", (44.4 - bot) / 0.1: " +
+//						(44.4D - bot) / 0.1D);
 				//process tile
 				processArea(top, bot, left, right, divisions, startDepth, computeLines, tileRecord.getValue(), pointFeatures, lineFeatures);
 				featureCount += pointFeatures.size() + lineFeatures.size();
@@ -153,33 +155,52 @@ public class GeoJsonBuilder {
 	 * @param outPoints
 	 * @param outLines
 	 */
-	public static void processArea(double top, double bot, double left, double right, int divisions, int depth, boolean drawLines, 
+	public static void processArea(BigDecimal top, BigDecimal bot, BigDecimal left, BigDecimal right, int divisions, int depth, boolean drawLines, 
 			List<TrailPointRecord> points, List<Feature> outPoints, List<Feature> outLines) throws Exception {
-		
-		double xScale = (right - left) / divisions; //longitude-distance / division
-		double yScale = (top - bot) / divisions; //latitude-distance / division
 		
 		Bucket[][] grid = new Bucket[divisions][divisions]; //rectangular grid that all points will be mapped into
 		List<Bucket> populatedBuckets = new LinkedList<Bucket>(); //list of non-empty buckets that have points
 		Iterator<TrailPointRecord> iterRawPoints = points.iterator();
 		
+		//must use big decimal format when dividing by fractions to avoid rounding error
+		//(right - left) / divisions
+		BigDecimal xScale = right.subtract(left).divide(new BigDecimal(divisions)); //longitude-distance / division
+		//(top - bot) / divisions
+		BigDecimal yScale = top.subtract(bot).divide(new BigDecimal(divisions)); //latitude-distance / division
+		
+//		BigDecimal tempY;
 		int y;
+//		BigDecimal tempX;
 		int x;
+		GPSTuple buckCenter;
 		while(iterRawPoints.hasNext()) { //place each point in the appropriate bucket based on it's lat and lng
 			TrailPointRecord point = iterRawPoints.next();
-			y = (int)Math.floor((point.getLatitude() - bot) / yScale);
-			x = (int)Math.floor((point.getLongitude() - left) / xScale);
+//			tempY = new BigDecimal(point.getLatitude()).subtract(bot);
+//			tempX = new BigDecimal(point.getLongitude() - left);
+			
+//			y = (int)Math.floor((point.getLatitude() - bot) / yScale);
+//			x = (int)Math.floor((point.getLongitude() - left) / xScale);
 			try {
+				y = (int)Math.floor(new BigDecimal(point.getLatitude()).subtract(bot)
+						.divide(yScale).doubleValue());
+				x = (int)Math.floor(new BigDecimal(point.getLongitude()).subtract(left)
+						.divide(xScale).doubleValue());
+				
 				if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
-					grid[y][x] = new Bucket(y, x, new GPSTuple(left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5));
+					// center = left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5
+					buckCenter = new GPSTuple(left.doubleValue() + x * xScale.doubleValue() + xScale.doubleValue() * 0.5,
+							bot.doubleValue() + y * yScale.doubleValue() + yScale.doubleValue() * 0.5);
+					grid[y][x] = new Bucket(y, x, buckCenter);
 					populatedBuckets.add(grid[y][x]);
 				}
+				
+				grid[y][x].add(point, depth <= 0); //add point to bucket
 			}
-			catch(ArrayIndexOutOfBoundsException e) {
-				throw new Exception("Array index out of bounds: " + e.getMessage() + ", x: " + x + ", y: " + y +
-						", bot: " + bot + ", left: " + left + ", yScale" + yScale + ", lat: " + point.getLatitude());
+			catch(ArrayIndexOutOfBoundsException | ArithmeticException e) {
+				throw new Exception("Array index out of bounds: " + e.getMessage() +
+						", bot: " + bot + ", left: " + left + ", yScale" + yScale + ", xScale: " + xScale + 
+						", lat: " + point.getLatitude() + ", long: " + point.getLongitude());
 			}
-			grid[y][x].add(point, depth <= 0); //add point to bucket
 		}
 		
 		Iterator<Bucket> buckIter = populatedBuckets.iterator();
@@ -202,13 +223,17 @@ public class GeoJsonBuilder {
 			
 		}
 		else {
-			double newBot;
-			double newLeft;
+//			double newBot;
+//			double newLeft;
+			BigDecimal newBot;
+			BigDecimal newLeft;
 			while(buckIter.hasNext()) {
 				bucket = buckIter.next();
-				newBot = bot + bucket.getY() * yScale;
-				newLeft = left + bucket.getX() * xScale;
-				processArea(newBot + yScale, newBot, newLeft, newLeft + xScale, 100, depth - 1, drawLines,
+//				newBot = bot + bucket.getY() * yScale;
+				newBot = bot.add(new BigDecimal(bucket.getY()).multiply(yScale));
+//				newLeft = left + bucket.getX() * xScale;
+				newLeft = left.add(new BigDecimal(bucket.getX()).multiply(xScale));
+				processArea(newBot.add(yScale), newBot, newLeft, newLeft.add(xScale), 100, depth - 1, drawLines,
 						bucket.getPoints(), outPoints, outLines);
 			}
 		}
