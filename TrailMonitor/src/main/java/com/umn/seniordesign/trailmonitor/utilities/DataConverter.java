@@ -57,6 +57,7 @@ public class DataConverter {
 		return records;
 	}
 	
+	//TODO: figure out how to make this function work, or get rid of it
 	public static void setDatabaseTableToBeta() throws Exception {
 		final String tableName = "TrailData_Beta";
 		

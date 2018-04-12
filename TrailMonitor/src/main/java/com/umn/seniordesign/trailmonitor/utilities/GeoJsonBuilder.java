@@ -72,6 +72,9 @@ public class GeoJsonBuilder {
 	 * @throws Exception Thrown if called with invalid zoomDepth or a GeoJsonTile is improperly built
 	 */
 	public static GeoTrailInfo build(Map<Integer, List<TrailPointRecord>> tileRecords, int zoomDepth) throws Exception { 
+		if(zoomDepth == -1) {
+			return build(tileRecords); //call other build method, which returns un-processed data
+		}
 		
 		//calculations for determining how to process data
 		int divisions;
@@ -91,7 +94,7 @@ public class GeoJsonBuilder {
 			startDepth = 0;
 		}
 		else {
-			throw new Exception("Invalid zoomDepth sent to GeoTrailInfo build function, must be in range 1-3");
+			throw new Exception("Invalid zoomDepth sent to GeoTrailInfo build function, must be in range 0-2");
 		}
 		String zoomRange = GeoTrailInfo.availableZoomRanges.get(zoomDepth);
 		

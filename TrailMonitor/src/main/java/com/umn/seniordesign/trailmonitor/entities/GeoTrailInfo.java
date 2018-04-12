@@ -3,13 +3,35 @@ package com.umn.seniordesign.trailmonitor.entities;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.impl.AvalonLogger;
+
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
 
 public class GeoTrailInfo {
 	private List<GeoJsonTile> tiles;
 	private String zoomRange;
 	long featureCount;
+	
+	//should always be ordered by increasing zoom values and should only overlap by one
 	public static final List<String> availableZoomRanges = Arrays.asList("4-6", "6-10", "10-20"); //Mapbox zoom values
+	/**
+	 * @param zoom - Mapbox zoom level
+	 * @return zoomDepth, which is the index in {@link #availableZoomRanges} where the range containing zoom can be found
+	 */
+	public static Integer getZoomDepth(int zoom) { //numbers within if statements must agree with ranges above
+		if(zoom >= 4 && zoom < 6) {
+			return 0;
+		}
+		else if(zoom >= 6 && zoom < 10) {
+			return 1;
+		}
+		else if(zoom >= 10 && zoom < 20) {
+			return 2;
+		}
+		else {
+			return null; //zoom is not within any of the available ranges
+		}
+	}
 	
 	public GeoTrailInfo() {
 		this.tiles = null;
