@@ -106,32 +106,32 @@ public class GeoJsonBuilder {
 		
 		//temp variable declarations
 		GeoJsonTile tile;
-		GPSTuple<Double, Double> tileCorner;
+		GPSTuple tileCorner;
 		//lists of features to be plotted
 		List<Feature> pointFeatures;
 		List<Feature> lineFeatures;
 		long featureCount = 0;
 		while(tileIterator.hasNext()) {
 			tileRecord = tileIterator.next();
+			tileCorner = DataConverter.expandCoordinateDimension(tileRecord.getKey());
+			//create new tile, type FeatureCollection
+			tile = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection, tileCorner, zoomRange);
+			pointFeatures = new LinkedList<Feature>();
+			lineFeatures = new LinkedList<Feature>();
 			if(tileRecord.getValue().size() > 0) {
 				//get top-bottom-left-right
-				tileCorner = DataConverter.expandCoordinateDimension(tileRecord.getValue().get(0).getCoordinate());
 				double top = tileCorner.lat + 1;
 				double bot = tileCorner.lat;
 				double left = tileCorner.lng;
 				double right = left + 1;
 				
-				//create new tile, type FeatureCollection
-				tile = new GeoJsonTile(GeoJsonTile.Types.FeatureCollection, tileCorner, zoomRange);
-				pointFeatures = new LinkedList<Feature>();
-				lineFeatures = new LinkedList<Feature>();
 				//process tile
 				processArea(top, bot, left, right, divisions, startDepth, computeLines, tileRecord.getValue(), pointFeatures, lineFeatures);
-				tile.setPointData(pointFeatures);
-				tile.setLineData(lineFeatures);
-				geoJsonTiles.add(tile);
 				featureCount += pointFeatures.size() + lineFeatures.size();
 			}
+			tile.setPointData(pointFeatures);
+			tile.setLineData(lineFeatures);
+			geoJsonTiles.add(tile);
 		}
 		
 		return new GeoTrailInfo(zoomRange, geoJsonTiles, featureCount);
@@ -169,16 +169,16 @@ public class GeoJsonBuilder {
 			x = (int)Math.floor((point.getLongitude() - left) / xScale);
 			
 			if(grid[y][x] == null) { //if bucket is empty/null create new bucket at this position
-				grid[y][x] = new Bucket(y, x, new GPSTuple<Double, Double>(left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5));
+				grid[y][x] = new Bucket(y, x, new GPSTuple(left + x * xScale + xScale * 0.5, bot + y * yScale + yScale * 0.5));
+				populatedBuckets.add(grid[y][x]);
 			}
 			grid[y][x].add(point, depth <= 0); //add point to bucket
-			populatedBuckets.add(grid[y][x]);
 		}
 		
 		Iterator<Bucket> buckIter = populatedBuckets.iterator();
 		Bucket bucket;
 		if(depth <= 0) { //base/deepest depth - compute lines
-			GPSTuple<Double, Double> center;
+			GPSTuple center;
 			Geometry<Double> geometry;
 			Properties properties;
 			Feature feature;
@@ -213,26 +213,26 @@ public class GeoJsonBuilder {
 		private int y;
 		private int x;
 		private String id;
-		private GPSTuple<Double, Double> center;
+		private GPSTuple center;
 		private double totalValues;
 		private Set<String> deviceIds;
 		private Set<String> connectedBucketIds; //ids of buckets that have connecting lines to this bucket
 		private long oldestTime;
 		private long latestTime;
 		
-		public Bucket(int latIndex, int lngIndex, GPSTuple<Double, Double> center) {
+		public Bucket(int latIndex, int lngIndex, GPSTuple center) {
 			this.points = new LinkedList<TrailPointRecord>();
 			this.y = latIndex;
 			this.x = lngIndex;
 			this.id = String.valueOf(this.y) + String.valueOf(this.x);
 			this.center = center;
 			this.totalValues = 0;
-			this.oldestTime = 0;
-			this.latestTime = Long.MAX_VALUE;
+			this.oldestTime = Long.MAX_VALUE;
+			this.latestTime = 0;
 		}
 		
 		public void add(TrailPointRecord point, boolean process) {
-			points.add(point);
+			this.points.add(point);
 			if(process) { //combine information from all points in bucket
 				this.totalValues += point.getValue();
 				if(deviceIds == null) {
@@ -273,7 +273,7 @@ public class GeoJsonBuilder {
 			return this.id;
 		}
 		
-		public GPSTuple<Double, Double> getCenter() {
+		public GPSTuple getCenter() {
 			return this.center;
 		}
 		

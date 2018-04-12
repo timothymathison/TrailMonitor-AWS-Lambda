@@ -91,6 +91,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         }
         catch(Exception e) { //error encountered building GeoJson data
         	logger.log("Internal Server Error: " + e.getMessage()); //logged in cloud watch
+        	logger.log(e.fillInStackTrace().toString());
         	return new GetDataResponse<GeoTrailInfo>(500, "Error Retrieving GeoJson data", null);
         }
         
