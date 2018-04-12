@@ -56,7 +56,7 @@ public class GeoJsonBuilder {
 			tile.setPointData(features);
 			geoJsonTiles.add(tile); //add to list of processed tiles
 		}
-		GeoTrailInfo geoTrailInfo = new GeoTrailInfo(geoJsonTiles, featureCount);
+		GeoTrailInfo geoTrailInfo = new GeoTrailInfo(GeoTrailInfo.availableZoomRanges.get(0), geoJsonTiles, featureCount);
 		
 		return geoTrailInfo;
 	}

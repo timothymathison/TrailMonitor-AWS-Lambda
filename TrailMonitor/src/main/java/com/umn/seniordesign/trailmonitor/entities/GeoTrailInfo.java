@@ -9,7 +9,7 @@ public class GeoTrailInfo {
 	private List<GeoJsonTile> tiles;
 	private String zoomRange;
 	long featureCount;
-	public static final List<String> availableZoomRanges = Arrays.asList("2-6", "6-10", "10-20");
+	public static final List<String> availableZoomRanges = Arrays.asList("4-6", "6-10", "10-20"); //Mapbox zoom values
 	
 	public GeoTrailInfo() {
 		this.tiles = null;
