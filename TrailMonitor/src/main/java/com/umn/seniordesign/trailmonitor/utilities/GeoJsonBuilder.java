@@ -168,18 +168,14 @@ public class GeoJsonBuilder {
 		//(top - bot) / divisions
 		BigDecimal yScale = top.subtract(bot).divide(new BigDecimal(divisions)); //latitude-distance / division
 		
-//		BigDecimal tempY;
 		int y;
-//		BigDecimal tempX;
 		int x;
 		GPSTuple buckCenter;
 		while(iterRawPoints.hasNext()) { //place each point in the appropriate bucket based on it's lat and lng
 			TrailPointRecord point = iterRawPoints.next();
-//			tempY = new BigDecimal(point.getLatitude()).subtract(bot);
-//			tempX = new BigDecimal(point.getLongitude() - left);
 			
-//			y = (int)Math.floor((point.getLatitude() - bot) / yScale);
-//			x = (int)Math.floor((point.getLongitude() - left) / xScale);
+			//y = (int)Math.floor((point.getLatitude() - bot) / yScale);
+			//x = (int)Math.floor((point.getLongitude() - left) / xScale);
 			try {
 				y = (int)Math.floor(new BigDecimal(point.getLatitude()).subtract(bot)
 						.divide(yScale).doubleValue());
@@ -197,7 +193,7 @@ public class GeoJsonBuilder {
 				grid[y][x].add(point, depth <= 0); //add point to bucket
 			}
 			catch(ArrayIndexOutOfBoundsException | ArithmeticException e) {
-				throw new Exception("Array index out of bounds: " + e.getMessage() +
+				throw new Exception("Error mapping points into bucket grid: " + e.getMessage() +
 						", bot: " + bot + ", left: " + left + ", yScale" + yScale + ", xScale: " + xScale + 
 						", lat: " + point.getLatitude() + ", long: " + point.getLongitude());
 			}
@@ -223,21 +219,18 @@ public class GeoJsonBuilder {
 			
 		}
 		else {
-//			double newBot;
-//			double newLeft;
 			BigDecimal newBot;
 			BigDecimal newLeft;
 			while(buckIter.hasNext()) {
 				bucket = buckIter.next();
-//				newBot = bot + bucket.getY() * yScale;
+				//newBot = bot + bucket.getY() * yScale;
 				newBot = bot.add(new BigDecimal(bucket.getY()).multiply(yScale));
-//				newLeft = left + bucket.getX() * xScale;
+				//newLeft = left + bucket.getX() * xScale;
 				newLeft = left.add(new BigDecimal(bucket.getX()).multiply(xScale));
 				processArea(newBot.add(yScale), newBot, newLeft, newLeft.add(xScale), 100, depth - 1, drawLines,
 						bucket.getPoints(), outPoints, outLines);
 			}
 		}
-		
 	}
 	
 	static private class Bucket {

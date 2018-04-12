@@ -47,7 +47,7 @@ public class ProcessGeoJsonRequest implements RequestHandler<GetDataRequest, Get
         }
         else {
         	try {
-            	zoomDepth = GeoTrailInfo.getZoomDepth(Integer.parseInt(zoom));
+            	zoomDepth = GeoTrailInfo.getZoomDepth(Double.parseDouble(zoom));
             }
             catch(NumberFormatException e) {
             	logger.log("Bad Request: invalid zoom parameter");

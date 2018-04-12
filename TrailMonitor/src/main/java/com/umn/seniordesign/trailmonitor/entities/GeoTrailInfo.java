@@ -16,7 +16,7 @@ public class GeoTrailInfo {
 	 * @param zoom - Mapbox zoom level
 	 * @return zoomDepth, which is the index in {@link #availableZoomRanges} where the range containing zoom can be found
 	 */
-	public static Integer getZoomDepth(int zoom) { //numbers within if statements must agree with ranges above
+	public static Integer getZoomDepth(double zoom) { //numbers within if statements must agree with ranges above
 		if(zoom >= 4 && zoom < 6) {
 			return 0;
 		}
