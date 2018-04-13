@@ -12,6 +12,7 @@ import java.util.Set;
 import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.GeoTrailInfo;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
+import com.umn.seniordesign.trailmonitor.entities.Tuple;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
 import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJsonTile;
 import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
@@ -126,9 +127,6 @@ public class GeoJsonBuilder {
 				BigDecimal bot = new BigDecimal(tileCorner.lat);
 				BigDecimal left = new BigDecimal(tileCorner.lng);
 				BigDecimal right = new BigDecimal(tileCorner.lng + 1);
-//				ContextHolder.getContext().getLogger().log("bot: " + bot + ", left: " + left + ", top: " + top + ", right: " + right +
-//						", (top - bot) / divisions: " + (top - bot) / divisions + ", (44.4 - bot) / 0.1: " +
-//						(44.4D - bot) / 0.1D);
 				//process tile
 				processArea(top, bot, left, right, divisions, startDepth, computeLines, tileRecord.getValue(), pointFeatures, lineFeatures);
 				featureCount += pointFeatures.size() + lineFeatures.size();
@@ -212,15 +210,35 @@ public class GeoJsonBuilder {
 				feature = new Feature(geometry, properties);
 				outPoints.add(feature);
 				
-				//TODO: compute lines
+				//compute lines
 				if(drawLines) {
-					Bucket otherBucket;
-					if(x != 0) { //bucket is not by the left edge of the current processing area
-						
+					Tuple coord;
+					feature = null;
+					//search for points to connect to in circle of buckets around current bucket
+					GridIterator iter = new GridIterator(divisions, divisions, bucket.getX(), bucket.getY());
+					while(iter.hasNext()) {
+						coord = iter.next();
+						if(coord != null) {
+							feature = bucket.connectBucket(grid[coord.y][coord.x]);
+							if(feature != null) {
+								outLines.add(feature);
+							}
+						}
+					}
+					if(feature == null) {// no adjacent buckets were found to connect to
+						iter.increaseRadius();
+						while(iter.hasNext()) {
+							coord = iter.next();
+							if(coord != null) {
+								feature = bucket.connectBucket(grid[coord.y][coord.x]);
+								if(feature != null) {
+									outLines.add(feature);
+								}
+							}
+						}
 					}
 				}
-			}
-				
+			}	
 		}
 		else {
 			BigDecimal newBot;
@@ -242,7 +260,6 @@ public class GeoJsonBuilder {
 		private int y;
 		private int x;
 		private String id;
-//		private GPSTuple center;
 		private double totalLat;
 		private double totalLng;
 		private double totalValues;
@@ -256,7 +273,6 @@ public class GeoJsonBuilder {
 			this.y = latIndex;
 			this.x = lngIndex;
 			this.id = String.valueOf(this.y) + String.valueOf(this.x);
-//			this.center = center;
 			this.totalLat = 0;
 			this.totalLng = 0;
 			this.totalValues = 0;
@@ -324,38 +340,48 @@ public class GeoJsonBuilder {
 			return this.latestTime;
 		}
 		
-		public void setConnected(String bucketId) {
+		public void setConnected(Bucket bucket) {
 			if(this.connectedBucketIds == null) {
 				this.connectedBucketIds = new HashSet<String>(8, 1.0F);
 			}
-			this.connectedBucketIds.add(bucketId);
+			this.connectedBucketIds.add(bucket.getId());
+			if(bucket.connectedBucketIds == null) {
+				bucket.connectedBucketIds = new HashSet<String>(8, 1.0F);
+			}
+			bucket.connectedBucketIds.add(this.id);
 		}
 		
-		public boolean isConnected(String bucketId) {
+		public boolean isConnected(Bucket bucket) {
 			if(this.connectedBucketIds == null) {
 				return false;
 			}
-			return this.connectedBucketIds.contains(bucketId);
+			return this.connectedBucketIds.contains(bucket.getId());
 		}
 		
 		/**
 		 * <h1>Determines if this bucket and another bucket should be connected, based on the points contained within each</h2>
 		 * @param otherBucket - other bucket to consider connecting
 		 * @return GeoJson {@link #Feature} linestring object which connects both buckets, or null if not to be connected
+		 * @throws Exception if an error occurs building GeoJson
 		 */
 		public Feature connectBucket(Bucket otherBucket) throws Exception {
-			if(!this.isConnected(otherBucket.getId())) {
+			if(otherBucket != null && !this.isConnected(otherBucket)) {
 				Iterator<String> iterator = this.deviceIds.iterator();
 				Set<String> otherBuckDeviceIds = otherBucket.getDeviceIds();
 				while(iterator.hasNext()) {
-					if(otherBuckDeviceIds.contains(iterator.next())) { //this bucket and other bucket have points from same device
+					if(otherBuckDeviceIds.contains(iterator.next()) //this bucket and other bucket have points from same device
+							/*&& this.getOldestTime() <= otherBucket.getLatestTime() && this.getLatestTime() >= otherBucket.getOldestTime()*/) { 
 						GPSTuple thisCenter = this.getAvgCenter();
 						GPSTuple otherCenter = otherBucket.getAvgCenter();
-						Geometry geometry = new Geometry<List<Double>>(Arrays.asList(Arrays.asList(thisCenter.lng, thisCenter.lat),
+						Geometry<List<Double>> geometry = new Geometry<List<Double>>(Arrays.asList(Arrays.asList(thisCenter.lng, thisCenter.lat),
 								Arrays.asList(otherCenter.lng, otherCenter.lat)));
 						Properties properties = new Properties((this.getValue() + otherBucket.getValue()) / 2,
 								(this.size() + otherBucket.size()) / 2, combineDeviceIds(this.getDeviceIds(), otherBucket.getDeviceIds()), 
 								Long.max(this.getOldestTime(), otherBucket.getOldestTime()));
+						Feature feature = new Feature(geometry, properties);
+						
+						this.setConnected(otherBucket);
+						return feature;
 					}
 				}
 			}
@@ -369,7 +395,7 @@ public class GeoJsonBuilder {
 		 * @param arg1 - A set of inner type String
 		 * @return Set<String> object containing all deviceIds
 		 */
-		static Set<String> combineDeviceIds(Set<String> arg0, Set<String> arg1) {
+		public static Set<String> combineDeviceIds(Set<String> arg0, Set<String> arg1) {
 			Set<String> ids = new HashSet<String>(arg0.size() + arg1.size(), 1.0F);
 			Iterator<String> iterator = arg0.iterator();
 			while(iterator.hasNext()) {
@@ -380,6 +406,71 @@ public class GeoJsonBuilder {
 				ids.add(iterator.next());
 			}
 			return ids;
+		}
+	}
+	
+	static class GridIterator {
+		int x;
+		int y;
+		int startX;
+		int startY;
+		int gridWidth;
+		int gridHeight;
+		int radius;
+		
+		/**
+		 * <h1>Acts as an iterator returning grid coordinates which move in a circle around starting coordinate</h1>
+		 * @param gridWidth - number of units across width of grid
+		 * @param gridHeight - number of units across height of grid
+		 * @param startX - center horizontal coordinate
+		 * @param startY - center vertical coordinate
+		 */
+		public GridIterator(int gridWidth, int gridHeight, int startX, int startY) {
+			this.startX = startX;
+			this.startY = startY;
+			this.x = startX - 1; //start in lower left corner
+			this.y = startY - 1;
+			this.gridWidth = gridWidth;
+			this.gridHeight = gridHeight;
+			radius = 1;
+		}
+		
+		public boolean hasNext() {
+			return !(this.x == this.startX && this.y == this.startY);
+		}
+		
+		public Tuple next() {
+			Tuple nxt = null;
+			if(this.x >= 0 && this.x < this.gridWidth && this.y >= 0 && this.y < this.gridHeight) { //if within bounds of grid
+				nxt = new Tuple(this.x, this.y);
+			}
+			
+			if(this.x == this.startX && this.y < this.startY) { //reached end point directly below starting square
+				this.y = this.startY; //next is the starting position
+			}
+			else if(this.x < this.startX && this.y < this.startY + this.radius) { //on left side
+				this.y++; //move up
+			}
+			else if(this.y > this.startY && this.x < this.startX + this.radius) { //on top
+				this.x++; //move right
+			}
+			else if(this.x > this.startX && this.y > this.startY - this.radius) { //on right side
+				this.y--; //move down
+			}
+			else { //on bottom side
+				this.x--; //love left
+			}
+			return nxt;
+		}
+		
+		/**
+		 * <h1>Increase radius of iterator</h1>
+		 * Subsequent calls to next() will move at a greater radius about the center
+		 */
+		public void increaseRadius() {
+			this.radius++;
+			this.y = this.startY - this.radius; //start radius steps down
+			this.x = this.startX - 1; //start one step left of horizontal center (startX)
 		}
 	}
 }

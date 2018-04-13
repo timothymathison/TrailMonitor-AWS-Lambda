@@ -105,7 +105,11 @@ public class DataConverter {
 		return longitude * 200 + latitude;
 	}
 	
-	//TODO: Document function
+	/**
+	 * <h1>Inverse of {@link #reduceCoordinateDimension}</h1>
+	 * @param coord - integer coordinate like that which was calculated by {@link #reduceCoordinateDimension}
+	 * @return {@link #GPSTuple} object containing extracted integer latitude and longitude values
+	 */
 	public static GPSTuple expandCoordinateDimension(int coord) {
 		Double temp = ((double)coord + 90) / 200;
 		Double lng = Math.floor(temp);

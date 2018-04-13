@@ -1,5 +1,6 @@
 package com.umn.seniordesign.trailmonitor.entities.geojson;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,14 +27,16 @@ public class Geometry<coordinateType> {
 			throw new Exception("Empty geometry coordinates list is prohibited");
 		}
 		this.coordinates = coordinates;
-		if(coordinates.get(0).getClass() == Double.class) {
+		coordinateType c = coordinates.get(0);
+		if(c.getClass() == Double.class) {
 			this.type = GeometryTypes.Point;
 		}
-		else if(coordinates.get(0).getClass() == List.class && ((List)coordinates.get(0)).get(0) == Double.class) {
+		else if((c.getClass() == Arrays.asList("").getClass() || c.getClass().isInstance(List.class)) && ((List)coordinates.get(0)).get(0).getClass() == Double.class) {
 			this.type = GeometryTypes.LineString;
 		}
 		else {
-			throw new Exception("Un-supported type for GeoJson.Geometry object");
+			throw new Exception("Un-supported type for GeoJson.Geometry object. " + coordinates.get(0).getClass().getName() + ", " 
+					+ ((List)coordinates.get(0)).get(0).getClass().getName());
 		}
 	}
 	
