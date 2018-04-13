@@ -11,7 +11,7 @@ public class GeoTrailInfo {
 	long featureCount;
 	
 	//should always be ordered by increasing zoom values and should only overlap by one
-	public static final List<String> availableZoomRanges = Arrays.asList("4-6", "6-10", "10-20"); //Mapbox zoom values
+	public static final List<String> availableZoomRanges = Arrays.asList("4-6", "6-10", "10-50"); //Mapbox zoom values
 	/**
 	 * @param zoom - Mapbox zoom level
 	 * @return zoomDepth, which is the index in {@link #availableZoomRanges} where the range containing zoom can be found
@@ -23,7 +23,7 @@ public class GeoTrailInfo {
 		else if(zoom >= 6 && zoom < 10) {
 			return 1;
 		}
-		else if(zoom >= 10 && zoom < 20) {
+		else if(zoom >= 10 && zoom < 50) {
 			return 2;
 		}
 		else {
