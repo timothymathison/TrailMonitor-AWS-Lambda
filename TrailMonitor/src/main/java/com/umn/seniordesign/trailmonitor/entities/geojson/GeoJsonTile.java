@@ -14,6 +14,8 @@ public class GeoJsonTile {
 	private Properties properties; //used when type = Feature
 	private GPSTuple cornerCoordinate;
 	private String zoomRange;
+	private Long totalTraffic; //total number of raw points collected from the geographic area within this tile,
+	//not to be confused with total number of features belonging to this tile (which is less)
 
 	public enum Types {
 		FeatureCollection,
@@ -24,12 +26,14 @@ public class GeoJsonTile {
 	public GeoJsonTile(Types type, GPSTuple cornerCoord) {
 		this.type = type;
 		this.cornerCoordinate = cornerCoord;
+		this.totalTraffic = 0L;
 	}
 	
 	public GeoJsonTile(Types type, GPSTuple cornerCoord, String zoomRange) {
 		this.type = type;
 		this.cornerCoordinate = cornerCoord;
 		this.zoomRange = zoomRange;
+		this.totalTraffic = 0L;
 	}
 	
 	public Types getType() {
@@ -106,5 +110,13 @@ public class GeoJsonTile {
 	
 	public void setZoomRange(String zoomRange) {
 		this.zoomRange = zoomRange;
+	}
+	
+	public Long getTotalTraffic() {
+		return this.totalTraffic;
+	}
+	
+	public void addToTotalTraffic(long num) {
+		this.totalTraffic += num;
 	}
 }

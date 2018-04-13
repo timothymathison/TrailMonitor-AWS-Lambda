@@ -133,6 +133,7 @@ public class GeoJsonBuilder {
 			}
 			tile.setPointData(pointFeatures);
 			tile.setLineData(lineFeatures);
+			tile.addToTotalTraffic(tileRecord.getValue().size());
 			geoJsonTiles.add(tile);
 		}
 		
