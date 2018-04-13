@@ -14,6 +14,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
+import com.umn.seniordesign.trailmonitor.utilities.ContextHolder;
 import com.umn.seniordesign.trailmonitor.utilities.DataConverter;
 
 public class DatabaseTask {
@@ -77,7 +78,7 @@ public class DatabaseTask {
 				totalPoints += points.size();
 				
 				//terminate loop and return error if allowed execution time is running out
-				if(context.getRemainingTimeInMillis() <= 4000) { //4000 milliseconds or less remaining
+				if(ContextHolder.getContext().getRemainingTimeInMillis() <= 4000) { //4000 milliseconds or less remaining
 					return new DatabaseTaskResult<Map<Integer, List<TrailPointRecord>>>(false, "Query Timeout", tileItems);
 				}
 			}	

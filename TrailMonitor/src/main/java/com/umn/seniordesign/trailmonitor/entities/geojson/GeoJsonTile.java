@@ -12,7 +12,7 @@ public class GeoJsonTile {
 	private List<Feature> lineData; //used when type = FeatureCollection
 	private Geometry geometry; //used when type = Feature
 	private Properties properties; //used when type = Feature
-	private GPSTuple<Double, Double> cornerCoordinate;
+	private GPSTuple cornerCoordinate;
 	private String zoomRange;
 
 	public enum Types {
@@ -21,12 +21,12 @@ public class GeoJsonTile {
 		//Incomplete list; can add more
 	}
 	
-	public GeoJsonTile(Types type, GPSTuple<Double, Double> cornerCoord) {
+	public GeoJsonTile(Types type, GPSTuple cornerCoord) {
 		this.type = type;
 		this.cornerCoordinate = cornerCoord;
 	}
 	
-	public GeoJsonTile(Types type, GPSTuple<Double, Double> cornerCoord, String zoomRange) {
+	public GeoJsonTile(Types type, GPSTuple cornerCoord, String zoomRange) {
 		this.type = type;
 		this.cornerCoordinate = cornerCoord;
 		this.zoomRange = zoomRange;
@@ -92,11 +92,11 @@ public class GeoJsonTile {
 		}
 	}
 	
-	public GPSTuple<Double,Double> getCornerCoordinate() {
+	public GPSTuple getCornerCoordinate() {
 		return this.cornerCoordinate;
 	}
 	
-	public void setCornerCoordinate(GPSTuple<Double, Double> cornerCoord) {
+	public void setCornerCoordinate(GPSTuple cornerCoord) {
 		this.cornerCoordinate = cornerCoord;
 	}
 	

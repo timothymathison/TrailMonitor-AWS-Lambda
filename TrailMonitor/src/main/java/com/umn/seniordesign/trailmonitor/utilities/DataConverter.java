@@ -57,6 +57,7 @@ public class DataConverter {
 		return records;
 	}
 	
+	//TODO: figure out how to make this function work, or get rid of it
 	public static void setDatabaseTableToBeta() throws Exception {
 		final String tableName = "TrailData_Beta";
 		
@@ -104,11 +105,15 @@ public class DataConverter {
 		return longitude * 200 + latitude;
 	}
 	
-	//TODO: Document function
-	public static GPSTuple<Double, Double> expandCoordinateDimension(int coord) {
+	/**
+	 * <h1>Inverse of {@link #reduceCoordinateDimension}</h1>
+	 * @param coord - integer coordinate like that which was calculated by {@link #reduceCoordinateDimension}
+	 * @return {@link #GPSTuple} object containing extracted integer latitude and longitude values
+	 */
+	public static GPSTuple expandCoordinateDimension(int coord) {
 		Double temp = ((double)coord + 90) / 200;
 		Double lng = Math.floor(temp);
-		return new GPSTuple<Double, Double>(lng, Math.round((temp - lng) * 200) - 90);
+		return new GPSTuple(lng, Math.round((temp - lng) * 200) - 90);
 	}
 	
 	/**

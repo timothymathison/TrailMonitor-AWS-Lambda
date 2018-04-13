@@ -1,29 +1,26 @@
 package com.umn.seniordesign.trailmonitor.entities;
 
-public class GPSTuple<X, Y> {
-	public final X lng;
-	public final Y lat;
+public class GPSTuple {
+	public final double lng;
+	public final double lat;
 	
-	public GPSTuple(X lng, Y lat) {
+	public GPSTuple(double lng, double lat) {
 		this.lng = lng;
 		this.lat = lat;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public GPSTuple(X lng, long lat) {
+	public GPSTuple(double lng, long lat) {
 		this.lng = lng;
-		this.lat = (Y)Long.valueOf(lat);
+		this.lat = Long.valueOf(lat).doubleValue();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public GPSTuple(long lng, Y lat) {
-		this.lng = (X)Long.valueOf(lng);
+	public GPSTuple(long lng, Double lat) {
+		this.lng = Long.valueOf(lng).doubleValue();
 		this.lat = lat;
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public GPSTuple(long lng, long lat) {
-		this.lng = (X)Long.valueOf(lng);
-		this.lat = (Y)Long.valueOf(lat);
+		this.lng = Long.valueOf(lng).doubleValue();
+		this.lat = Long.valueOf(lat).doubleValue();
 	}
 }
