@@ -1,8 +1,9 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,12 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Feature;
-import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Geometry;
-import com.umn.seniordesign.trailmonitor.entities.geojson.Properties;
 
 public class DataConverter {
 
@@ -58,30 +57,32 @@ public class DataConverter {
 		return records;
 	}
 	
-	/**
-	 * <h1>Builds a GeoJson object containing features which can be interpreted and displayed on a map</h2>
-	 * @param records - List containing objects of class type TrailPointRecord
-	 * @return Object of class type GeoJson
-	 * @throws Exception Thrown when the GeoJson is improperly built
-	 */
-	public static GeoJson buildGeoJson(List<TrailPointRecord> records) throws Exception {
-		GeoJson geoJson = new GeoJson(GeoJson.Types.FeatureCollection);  
-		//type "FeatureCollection" which contains a list of features to be plotted
-		List<Feature> features = new LinkedList<Feature>();
-		TrailPointRecord record;
-		Geometry<Double> geometry;
-		Properties properties;
+	//TODO: figure out how to make this function work, or get rid of it
+	public static void setDatabaseTableToBeta() throws Exception {
+		final String tableName = "TrailData_Beta";
 		
-		Iterator<TrailPointRecord> iterator = records.iterator();
-		while(iterator.hasNext()) { //iterate through trail records and create features
-			record = iterator.next();
-			geometry = new Geometry<Double>(Arrays.asList(record.getLongitude(), record.getLatitude()));
-			properties = new Properties(record.getValue().intValue(), record.getDeviceId(), record.getTimeStamp().getTimeInMillis());
-			features.add(new Feature(geometry, properties));
-		}
-		geoJson.setFeatures(features);
+		final DynamoDBTable oldAnnotation = (DynamoDBTable)TrailPointRecord.class.getAnnotations()[0];
+//	    System.out.println("oldAnnotation = " + oldAnnotation.someProperty());
+	    Annotation newAnnotation = new DynamoDBTable() {
+
+	        @Override
+	        public String tableName() {
+	            return tableName;
+	        }
+
+	        @Override
+	        public Class<? extends Annotation> annotationType() {
+	            return oldAnnotation.annotationType();
+	        }
+	    };
+	    Field field = Class.class.getDeclaredField("annotations");
+	    field.setAccessible(true);
+	    Map<Class<? extends Annotation>, Annotation> annotations = (Map<Class<? extends Annotation>, Annotation>) field.get(TrailPointRecord.class);
+	    annotations.put(DynamoDBTable.class, newAnnotation);
+
+//	    DynamoDBTable modifiedAnnotation = (DynamoDBTable)TrailPointRecord.class.getAnnotations()[0];
+//	    System.out.println("modifiedAnnotation = " + modifiedAnnotation.tableName());
 		
-		return geoJson;
 	}
 	
 	/**
@@ -102,6 +103,17 @@ public class DataConverter {
 	 */
 	public static int reduceCoordinateDimension(int longitude, int latitude) {
 		return longitude * 200 + latitude;
+	}
+	
+	/**
+	 * <h1>Inverse of {@link #reduceCoordinateDimension}</h1>
+	 * @param coord - integer coordinate like that which was calculated by {@link #reduceCoordinateDimension}
+	 * @return {@link #GPSTuple} object containing extracted integer latitude and longitude values
+	 */
+	public static GPSTuple expandCoordinateDimension(int coord) {
+		Double temp = ((double)coord + 90) / 200;
+		Double lng = Math.floor(temp);
+		return new GPSTuple(lng, Math.round((temp - lng) * 200) - 90);
 	}
 	
 	/**

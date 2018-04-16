@@ -1,15 +1,17 @@
 package com.umn.seniordesign.trailmonitor.lambda;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.umn.seniordesign.trailmonitor.entities.GeoTrailInfo;
 import com.umn.seniordesign.trailmonitor.entities.GetDataRequest;
 import com.umn.seniordesign.trailmonitor.entities.GetDataResponse;
-import com.umn.seniordesign.trailmonitor.entities.geojson.GeoJson;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
@@ -21,7 +23,15 @@ public class ProcessGeoJsonRequestTest {
     @BeforeClass
     public static void createInput() throws IOException {
         //set up your sample input object here.
-        input = null;
+        input = new GetDataRequest();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("lim-top", "45");
+        params.put("lim-left", "-95");
+        params.put("lim-bot", "44");
+        params.put("lim-right", "-93");
+        params.put("start-time", "0");
+        params.put("zoom", "5");
+        input.setParams(params);
     }
 
     private Context createContext() {
@@ -38,7 +48,7 @@ public class ProcessGeoJsonRequestTest {
         ProcessGeoJsonRequest handler = new ProcessGeoJsonRequest();
         Context ctx = createContext();
 
-        GetDataResponse<GeoJson> output = handler.handleRequest(input, ctx);
+        GetDataResponse<GeoTrailInfo> output = handler.handleRequest(input, ctx);
 
         //validate output here if needed.
         Assert.assertEquals("Hello from Lambda!", output);
