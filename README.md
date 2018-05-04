@@ -36,11 +36,57 @@ Header(s):
 
 ---
 
-### Output for Visualization (GeoJSON):
+### Output for Visualization (GeoTrailInfo using GeoJSON):
 
 Point Data: 
 ```
 {
+	"<tile-id>": {
+		type: "<data-type>",
+		zoomRange: ""
+		cornerCoordinate: { lng: <integer-longitude>, lat: <integer-latitude>},
+		totalTraffic: <total-num-raw-points-for-this-tile>,
+		pointData: [
+			{
+				"type": "Feature",
+				"geometry": {
+					"type": "Point",
+					"coordinates": [<longiduted-value>, <latitude-value>]
+				},
+				"properties": {
+					"value": <roughness-value>,
+					"traffic": <num-raw-points>,
+					"deviceIds": ["<id-of-one-originating-device>", "<id-of-second-originating-device>", ...],
+					"timeStamp": <milliseconds-since-epoch>
+				}
+			}
+			.
+			.
+			.
+		],
+		lineData: [
+			{
+				"type": "Feature",
+				"geometry": {
+					"type": "LineString",
+					"coordinates": [[<start-longiduted-value>, <start-latitude-value>], [<end-longiduted-value>, <end-latitude-value>]]
+				},
+				"properties": {
+					"value": <roughness-value>,
+					"traffic": <num-raw-points>,
+					"deviceIds": ["<id-of-one-originating-device>", "<id-of-second-originating-device>", ...],
+					"timeStamp": <milliseconds-since-epoch>
+				}
+			}
+			.
+			.
+			.
+		]
+	},
+	{
+		
+	}
+
 	"type": "geojson",
 	"data": {
 		"type": "FeatureCollection",
