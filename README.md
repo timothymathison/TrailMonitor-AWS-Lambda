@@ -8,7 +8,7 @@ Data collection is done by the on-vehicle device designed as part of the same pr
 
 ---
 
-## Data format
+## Data Formats
 
 ### Input Trail Data (JSON):
 ```
@@ -65,7 +65,7 @@ Header(s):
 							"deviceIds": ["<id-of-one-originating-device>", "<id-of-second-originating-device>", ...],
 							"timeStamp": <milliseconds-since-epoch>
 						}
-					}
+					},
 					.
 					.
 					.
@@ -83,7 +83,7 @@ Header(s):
 							"deviceIds": ["<id-of-one-originating-device>", "<id-of-second-originating-device>", ...],
 							"timeStamp": <milliseconds-since-epoch>
 						}
-					}
+					},
 					.
 					.
 					.
@@ -107,7 +107,7 @@ Header(s):
 							"deviceIds": ["240057000b51343334363138", "240057000a41343334363138", ...],
 							"timeStamp": 1522431342473
 						}
-					}
+					},
 					.
 					.
 					.
@@ -125,7 +125,7 @@ Header(s):
 							"deviceIds": ["240057000b51343334363138", "240057000a41343334363138", ...],
 							"timeStamp": 1522431342473
 						}
-					}
+					},
 					.
 					.
 					.
@@ -143,6 +143,9 @@ Method: `GET`
 URL (Development): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
 
 URL (Production): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor/trail-data`
+
+Header(s): 
+- `Accept: application/json ...`
 
 ---
 
@@ -226,7 +229,7 @@ Currently, both stages are from deployments with identical configurations except
 
 Custom configurations are primarily set in relation to response status codes and body content mapping.
 
-Body mapping template for requests to the GET method (configured under: `API/Resources/<method>/Integration Response/Body Mapping Templates`):
+Below is the body mapping template for requests to the GET method (configured under: `API/Resources/<method>/Integration Response/Body Mapping Templates`):
 
 Content-Type: `application/json`
 ```
