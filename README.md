@@ -45,11 +45,11 @@ Header(s):
 	data: {
 		availableZoomRanges: [ "4-6", "6-10", "10-50" ],
 		featureCount: <total-num-GeoJson-features>,
-		zoomRange: "<cooresponding-zoom-range-for-this-request-and-data>",
+		zoomRange: "<corresponding-zoom-range-for-this-request-and-data>",
 		tiles: [
 			{
 				type: "<data-type>",
-				zoomRange: "<cooresponding-zoom-range-for-which-data-is-valid>"
+				zoomRange: "<corresponding-zoom-range-for-which-data-is-valid>"
 				cornerCoordinate: { lng: <integer-longitude>, lat: <integer-latitude> },
 				totalTraffic: <total-num-raw-points-for-this-tile>,
 				pointData: [
@@ -254,7 +254,7 @@ The API Regex patterns are:
 - 400 - `.*"status": "400 Bad Request".*`
 - 500 - `.*"status": "500 Internal Server Error".*`
 - 200 - default for GET, no pattern
-- 204 - default for POST, no pattern (__Note:__ 204 cooresponds to not content; therefore empty body is returned)
+- 204 - default for POST, no pattern (__Note:__ 204 corresponds to not content; therefore empty body is returned)
 
 For more detailed information and instructions on configuring API Gateway, see the API references below.
 
