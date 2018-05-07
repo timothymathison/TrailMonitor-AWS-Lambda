@@ -256,6 +256,7 @@ public class GeoJsonBuilder {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	static private class Bucket {
 		private List<TrailPointRecord> points;
 		private int y;
