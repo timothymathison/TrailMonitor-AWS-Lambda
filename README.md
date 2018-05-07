@@ -26,7 +26,7 @@ Data collection is done by the on-vehicle device designed as part of the same pr
 }
 ```
 
-#### To Call
+### To Call
 
 Method: `POST`
 
@@ -142,7 +142,7 @@ Header(s):
 }
 ```
 
-#### To Call
+### To Call
 
 Method: `GET`
 
@@ -240,7 +240,7 @@ In the future, depending on performance considerations, it may be preferable to 
 Since the the use of the system will quickly and inevitably result in the accumulation of points over the top of each other in certain areas, the visualization algorithm uses a 2-dim bucket sort stratagy to geographically organize trail condition points.
 Points falling in the same bucket are combined into a single point. The grid resolution will adjust depending on the requested zoom detail.
 
-In addition, the processing algorithm attempts to draw lines connecting points believed to have been created by the same device, along its path of movement.
+In addition, the processing algorithm attempts to draw lines connecting points believed to have been created by the same device, along the vehicle's path of movement.
 This feature is the least developed, due to its complex nature and time limitations when designing the visualization algorithm.
 Future improvements to the algorithm would most likely make use of point timestamps and the list order of points (points are automatically sorted by timestamp in the database) to calculate direction and speed of vehicle movements, from which to determine the correct line connections.
 Such an approach differs from the current algorithm which creates lines connecting any points that are within a specific radius and share the same vehicle device id.
