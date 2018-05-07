@@ -25,6 +25,9 @@ Data collection is done by the on-vehicle device designed as part of the same pr
 	]
 }
 ```
+
+#### To Call
+
 Method: `POST`
 
 URL (Development): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
@@ -138,6 +141,9 @@ Header(s):
 	}
 }
 ```
+
+#### To Call
+
 Method: `GET`
 
 URL (Development): `https://s71x34ids1.execute-api.us-east-2.amazonaws.com/TrailMonitor_Beta/trail-data`
@@ -219,6 +225,26 @@ To Invoke Lambda Function in cloud (from Eclipse):
 
 
 __Note:__ Function should also be tested via the __API Gateway__ interface, and final testing should be done using the __API URL__ above.
+
+---
+
+## Design - Algorithms and Logic
+
+The algorithms and logic within this project can be categorized primarily within two main categories:
+Saving and retreiving trail data to and from the database; and processing trail data points into GeoJson visualization features.
+
+Processing the trail data into an accurate visualization of trail conditions is the more complicated and computationally intense task.
+Currently, this processing takes place each and every time visualization data is requested.
+In the future, depending on performance considerations, it may be preferable to perform these calculations at certain intervals and store the resulting JSON in files, which can be retrieved by visualization requests.
+
+Since the the use of the system will quickly and inevitably result in the accumulation of points over the top of each other in certain areas, the visualization algorithm uses a 2-dim bucket sort stratagy to geographically organize trail condition points.
+Points falling in the same bucket are combined into a single point. The grid resolution will adjust depending on the requested zoom detail.
+
+In addition, the processing algorithm attempts to draw lines connecting points believed to have been created by the same device, along its path of movement.
+This feature is the least developed, due to its complex nature and time limitations when designing the visualization algorithm.
+Future improvements to the algorithm would most likely make use of point timestamps and the list order of points (points are automatically sorted by timestamp in the database) to calculate direction and speed of vehicle movements, from which to determine the correct line connections.
+Such an approach differs from the current algorithm which creates lines connecting any points that are within a specific radius and share the same vehicle device id.
+Meanwhile care must be taken to preserve processing speed performance by staying within the self-imposed O(n) runtime constraint.
 
 ---
 
