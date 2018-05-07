@@ -1,7 +1,5 @@
 package com.umn.seniordesign.trailmonitor.utilities;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.umn.seniordesign.trailmonitor.entities.GPSTuple;
 import com.umn.seniordesign.trailmonitor.entities.TrailPoint;
 import com.umn.seniordesign.trailmonitor.entities.TrailPointRecord;
@@ -57,33 +54,6 @@ public class DataConverter {
 		return records;
 	}
 	
-	//TODO: figure out how to make this function work, or get rid of it
-	public static void setDatabaseTableToBeta() throws Exception {
-		final String tableName = "TrailData_Beta";
-		
-		final DynamoDBTable oldAnnotation = (DynamoDBTable)TrailPointRecord.class.getAnnotations()[0];
-//	    System.out.println("oldAnnotation = " + oldAnnotation.someProperty());
-	    Annotation newAnnotation = new DynamoDBTable() {
-
-	        @Override
-	        public String tableName() {
-	            return tableName;
-	        }
-
-	        @Override
-	        public Class<? extends Annotation> annotationType() {
-	            return oldAnnotation.annotationType();
-	        }
-	    };
-	    Field field = Class.class.getDeclaredField("annotations");
-	    field.setAccessible(true);
-	    Map<Class<? extends Annotation>, Annotation> annotations = (Map<Class<? extends Annotation>, Annotation>) field.get(TrailPointRecord.class);
-	    annotations.put(DynamoDBTable.class, newAnnotation);
-
-//	    DynamoDBTable modifiedAnnotation = (DynamoDBTable)TrailPointRecord.class.getAnnotations()[0];
-//	    System.out.println("modifiedAnnotation = " + modifiedAnnotation.tableName());
-		
-	}
 	
 	/**
 	 * <h1>Generates a unique linear value (tile identifier/coordinate) for each integer latitude/longitude combination</h1>

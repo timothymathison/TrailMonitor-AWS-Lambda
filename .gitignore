@@ -1,5 +1,6 @@
 /.metadata/
 .recommenders/
+.idea/
 TrailMonitor/target/
 RemoteSystemsTempFiles/
 /scripts/*.json
