@@ -162,7 +162,7 @@ Required:
 
 Recommended:
 - [IDE - Eclipse Oxygen](http://www.eclipse.org/downloads/)
-- [AWS Toolkit for Eclipse](https://aws.amazon.com/eclipse/) (Retreive access keys by creating user in AWS IAM console)
+- [AWS Toolkit for Eclipse](https://aws.amazon.com/eclipse/) (Retrieve access keys by creating user in AWS IAM console)
 
 
 ## Deployment and Testing
@@ -231,7 +231,7 @@ __Note:__ Function should also be tested via the __API Gateway__ interface, and 
 ## Design - Algorithms and Logic
 
 The algorithms and logic within this project can be categorized primarily within two main categories:
-Saving and retreiving trail data to and from the database; and processing trail data points into GeoJson visualization features.
+Saving and retrieving trail data to and from the database; and processing trail data points into GeoJson visualization features.
 
 Processing the trail data into an accurate visualization of trail conditions is the more complicated and computationally intense task.
 Currently, this processing takes place each and every time visualization data is requested.
