@@ -237,8 +237,8 @@ Processing the trail data into an accurate visualization of trail conditions is 
 Currently, this processing takes place each and every time visualization data is requested.
 In the future, depending on performance considerations, it may be preferable to perform these calculations at certain intervals and store the resulting JSON in files, which can be retrieved by visualization requests.
 
-Since the the use of the system will quickly and inevitably result in the accumulation of points over the top of each other in certain areas, the visualization algorithm uses a 2-dim bucket sort stratagy to geographically organize trail condition points.
-Points falling in the same bucket are combined into a single point. The grid resolution will adjust depending on the requested zoom detail.
+Since the use of the system will quickly and inevitably result in the accumulation of points over the top of each other in certain areas, the visualization algorithm uses a 2-dim bucket sort strategy to geographically organize trail condition points.
+Points falling in the same bucket are combined into a single point. The grid resolution will adjust depending on the requested zoom level.
 
 In addition, the processing algorithm attempts to draw lines connecting points believed to have been created by the same device, along the vehicle's path of movement.
 This feature is the least developed, due to its complex nature and time limitations when designing the visualization algorithm.
@@ -248,10 +248,10 @@ Meanwhile care must be taken to preserve processing speed performance by staying
 
 ---
 
-## API Gateway Configuration
+## AWS API Gateway Configuration
 
 The API for this data service (TrailMonitor) has two methods (GET, and POST) and is deployed to two stages (TrailMonitor and TrailMonitor_Beta).
-Currently, both stages are from deployments with identical configurations except for the Lambda functions to invoke: the `*_Beta` stage will invoke the pair of `*_Beta` Lambda functions.
+Currently, both stages are from deployments with identical configurations except for which Lambda functions to invoke; the `*_Beta` stage will invoke the pair of `*_Beta` Lambda functions.
 
 Custom configurations are primarily set in relation to response status codes and body content mapping.
 
@@ -284,6 +284,13 @@ The API Regex patterns are:
 
 For more detailed information and instructions on configuring API Gateway, see the API references below.
 
+## AWS Cloud Watch Logging
+
+Calls, within the java code, to `logger.log(...)` (retrieved from `context.getLogger()`) automatically go to Amazon Cloud Watch.
+Currently, every request to the data service posts a log message to Cloud Watch with information about the request.
+Additionally, any errors that occur are logged to Cloud Watch.
+In this way, Cloud Watch is extremely helpful finding and debugging the cause of failed requests.
+
 ---
 
 ## References/Resources
@@ -294,5 +301,6 @@ For more detailed information and instructions on configuring API Gateway, see t
 - [AWS API Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
 - [AWS API Gateway Template Mapping](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
 - [AWS DynamoDB Java Data Mapping](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
+- [AWS CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html)
 - [GeoJson](http://geojson.org/)
 - [GeoJson Wiki](http://wiki.geojson.org/GeoJSON_draft_version_6)
